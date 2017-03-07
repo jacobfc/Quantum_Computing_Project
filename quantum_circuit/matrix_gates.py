@@ -1,5 +1,6 @@
 import numpy as np
 from .gates_interface import Gate as AbstractGate
+from .functional_gates import Gate as FunctionalGate
 
 """
 Convention for the basis:
@@ -82,4 +83,15 @@ class Gate(AbstractGate):
         :param control_qubits: List of integers, specifying control qubits.
         :return: Gate representing the full operation.
         """
-        pass
+        fn_gate = FunctionalGate.controlled_u(qubit_count, u,
+                                              apply_qubits, control_qubits)
+        basis_size = 2 ** qubit_count
+
+        mat = np.zeros((basis_size, basis_size), np.float64)
+        for bs in range(basis_size):
+            mat[:, bs] = fn_gate.eval_bs(bs).amplitudes
+
+        return Gate(qubit_count, basis_size, mat)
+
+    def __repr__(self):
+        return self.matrix.__repr__()
