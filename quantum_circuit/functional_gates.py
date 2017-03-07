@@ -72,7 +72,7 @@ class Gate(AbstractGate):
 
                 # set apply qubits to zero
                 empty_apply = basis_state - \
-                    sum(1 << i for i in apply_qubits) & basis_state
+                              (sum(1 << i for i in apply_qubits) & basis_state)
 
                 for k in range(len(u_out_state)):
                     set_apply = sum(1 << apply_qubits[i]
