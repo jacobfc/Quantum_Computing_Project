@@ -9,9 +9,6 @@ the representation in the computational basis would be
 
 Therefore |6> = |110> = [0, 1, 1].
 """
-__author__ = "Mathis Gerdes"
-__copyright__ = "Copyright 2017, Mathis Gerdes"
-__license__ = "MIT"
 
 
 class Gate(AbstractGate):
