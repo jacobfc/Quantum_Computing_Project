@@ -19,6 +19,9 @@ class State(object):
         state[basis_state] = 1.0
         return State(state)
 
+    def __len__(self):
+        return self.basis_size
+
     def __getitem__(self, item):
         return self.amplitudes.__getitem__(item)
 

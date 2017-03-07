@@ -1,4 +1,6 @@
 import numpy as np
+
+from .mainframe import State
 from .gates_interface import Gate as AbstractGate
 from .functional_gates import Gate as FunctionalGate
 
@@ -18,8 +20,11 @@ class Gate(AbstractGate):
         self._basis_size = basis_size
         self.matrix = np.array(matrix, np.float64)
 
-    def eval_bs(self, basis_state):
-        return self.matrix[:, basis_state]
+    def eval_bs(self, basis_state, need_copy=True):
+        if need_copy:
+            return State(np.copy(self.matrix[:, basis_state]))
+        else:
+            return State(self.matrix[:, basis_state])
 
     @property
     def qubit_count(self):
