@@ -68,7 +68,7 @@ class Gate(AbstractGate):
                 # now the result in u_out_state has to be incorporated with
                 # the rest of the qubits (which remain unchanged)
 
-                out_state_raw = np.zeros(basis_size, np.float64)
+                out_state_raw = np.zeros(basis_size, np.complex64)
 
                 # set apply qubits to zero
                 empty_apply = basis_state - \

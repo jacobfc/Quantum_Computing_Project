@@ -18,7 +18,7 @@ class Gate(AbstractGate):
     def __init__(self, qubit_count, basis_size, matrix):
         self._qubit_count = qubit_count
         self._basis_size = basis_size
-        self.matrix = np.array(matrix, np.float64)
+        self.matrix = np.array(matrix, np.complex64)
 
     def eval_bs(self, basis_state, need_copy=True):
         if need_copy:
@@ -92,7 +92,7 @@ class Gate(AbstractGate):
                                               apply_qubits, control_qubits)
         basis_size = 2 ** qubit_count
 
-        mat = np.zeros((basis_size, basis_size), np.float64)
+        mat = np.zeros((basis_size, basis_size), np.complex64)
         for bs in range(basis_size):
             mat[:, bs] = fn_gate.eval_bs(bs).amplitudes
 

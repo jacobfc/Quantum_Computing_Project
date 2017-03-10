@@ -4,7 +4,7 @@ import abc
 
 class State(object):
     def __init__(self, initial_state):
-        self.amplitudes = np.array(initial_state, np.float64)
+        self.amplitudes = np.array(initial_state, np.complex64)
         self.basis_size = len(self.amplitudes)
         self.qubit_count = int(np.log2(self.basis_size))
 
@@ -51,7 +51,8 @@ class State(object):
         return self.amplitudes.__iter__()
 
     def __str__(self):
-        return " + ".join("%.3f |%d>" % (self.amplitudes[i], i)
+        format_c = lambda c: "(%.3f + i %.3f)" % (c.real, c.imag)
+        return " + ".join("%s |%d>" % (format_c(self.amplitudes[i]), i)
                           for i in range(self.basis_size)
                           if self.amplitudes[i] != 0)
 
