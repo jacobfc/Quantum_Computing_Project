@@ -36,6 +36,24 @@ class Gate(AbstractGate):
 
     @classmethod
     def controlled_u(cls, qubit_count, u, apply_qubits, control_qubits):
+
+        """
+        Jacob attempt:
+        operations_list =[] #list of operations, with index corresponding to the qubit being operated on
+        for i in range(qubit_count):
+            if control_qubits.contains(i):
+                operations_list.append("control") #maybe don't use strings, but some control matrix call?
+            else if apply_qubits.contains(i):
+                operations_list.append("apply") #maybe append u instead?
+            else:
+                operations_list.append("identity") #if not a control or apply qubit, nothing happens
+
+        for i in range(qubit_count):
+            if operations_list[i] == "control":
+
+            np.kronecker(operations_list) #not exactly the code, but apply 1-qubit gates in the order determined in the loop above.
+
+        """
         """ Create a controlled-U gate, given the matrix and the used qubits.
 
         Example:
