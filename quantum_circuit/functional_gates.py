@@ -1,5 +1,5 @@
 import numpy as np
-from .gates_interface import Gate as AbstractGate
+from .mainframe import Gate as AbstractGate
 from .mainframe import State
 
 
@@ -72,7 +72,7 @@ class Gate(AbstractGate):
 
                 # set apply qubits to zero
                 empty_apply = basis_state - \
-                              (sum(1 << i for i in apply_qubits) & basis_state)
+                    (sum(1 << i for i in apply_qubits) & basis_state)
 
                 for k in range(len(u_out_state)):
                     set_apply = sum(1 << apply_qubits[i]
@@ -83,3 +83,16 @@ class Gate(AbstractGate):
                 return State(out_state_raw)
 
         return cls(qubit_count, basis_size, _eval_bs)
+
+    def __call__(self, state):
+        # simple implementation, may be overridden
+        return sum(state[k] * self.eval_bs(k) for k in range(self.basis_size))
+
+    def __mul__(self, gate2):
+        """ g1 * g2 is equivalent of saying first apply g2 then g1
+
+        :param gate2: A gate.
+        :return: A functional gate equivalent to the operation g1(g2(state)).
+        """
+        return Gate(self.qubit_count, self.basis_size,
+                    lambda bs: self(gate2.eval_bs(bs)))

@@ -1,7 +1,7 @@
 import numpy as np
 
 from .mainframe import State
-from .gates_interface import Gate as AbstractGate
+from .mainframe import Gate as AbstractGate
 from .functional_gates import Gate as FunctionalGate
 
 """
@@ -98,5 +98,22 @@ class Gate(AbstractGate):
 
         return Gate(qubit_count, basis_size, mat)
 
+    def __call__(self, state):
+        return np.dot(self.matrix, state.amplitudes)
+
     def __repr__(self):
         return self.matrix.__repr__()
+
+    def __mul__(self, gate2):
+        """ g1 * g2 is equivalent of saying first apply g2 then g1
+
+        :param gate2: A gate.
+        :return: A gate equivalent to the operation g1(g2(state)).
+            The gate is a matrix gate if gate2 is a matrix gate,
+            otherwise a functional gate is returned
+        """
+        if isinstance(gate2, Gate):
+            return Gate(self.qubit_count, self.basis_size,
+                        np.dot(self.matrix, gate2.matrix))
+        else:
+            return gate2 * self
