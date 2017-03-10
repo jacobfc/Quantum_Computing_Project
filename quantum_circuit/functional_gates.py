@@ -4,8 +4,8 @@ from .mainframe import State
 
 
 class Gate(AbstractGate):
-    def __init__(self, qubit_count, basis_size, _eval_bs):
-        self._basis_size = basis_size
+    def __init__(self, qubit_count, _eval_bs):
+        self._basis_size = 1 << qubit_count
         self._qubit_count = qubit_count
         self._eval_bs = _eval_bs
 
@@ -82,7 +82,7 @@ class Gate(AbstractGate):
 
                 return State(out_state_raw)
 
-        return cls(qubit_count, basis_size, _eval_bs)
+        return cls(qubit_count, _eval_bs)
 
     def __call__(self, state):
         # simple implementation, may be overridden
@@ -94,5 +94,4 @@ class Gate(AbstractGate):
         :param gate2: A gate.
         :return: A functional gate equivalent to the operation g1(g2(state)).
         """
-        return Gate(self.qubit_count, self.basis_size,
-                    lambda bs: self(gate2.eval_bs(bs)))
+        return Gate(self.qubit_count, lambda bs: self(gate2.eval_bs(bs)))

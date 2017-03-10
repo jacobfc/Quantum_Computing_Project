@@ -15,9 +15,9 @@ Therefore |6> = |110> = [0, 1, 1].
 
 
 class Gate(AbstractGate):
-    def __init__(self, qubit_count, basis_size, matrix):
+    def __init__(self, qubit_count, matrix):
         self._qubit_count = qubit_count
-        self._basis_size = basis_size
+        self._basis_size = 1 << qubit_count
         self.matrix = np.array(matrix, np.complex64)
 
     def eval_bs(self, basis_state, need_copy=True):
@@ -96,7 +96,7 @@ class Gate(AbstractGate):
         for bs in range(basis_size):
             mat[:, bs] = fn_gate.eval_bs(bs).amplitudes
 
-        return Gate(qubit_count, basis_size, mat)
+        return Gate(qubit_count, mat)
 
     def __call__(self, state):
         return np.dot(self.matrix, state.amplitudes)
@@ -113,7 +113,6 @@ class Gate(AbstractGate):
             otherwise a functional gate is returned
         """
         if isinstance(gate2, Gate):
-            return Gate(self.qubit_count, self.basis_size,
-                        np.dot(self.matrix, gate2.matrix))
+            return Gate(self.qubit_count, np.dot(self.matrix, gate2.matrix))
         else:
             return gate2 * self
