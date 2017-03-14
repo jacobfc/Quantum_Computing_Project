@@ -7,6 +7,10 @@ def create_rotation_gate(theta):
 	"""
 	:param theta: the rotation angle
 	:return: phase rotation gate for 1 qubit, rotating by theta
+	Matrix representation is:
+	/1         0      \
+	\0    e^(i*theta) /
+
 	"""
 	return MatrixGate(1, [[1, 0], [0, np.exp( theta*1j )]])
 
