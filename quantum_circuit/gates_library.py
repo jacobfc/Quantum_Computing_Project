@@ -8,9 +8,7 @@ def create_rotation_gate(theta):
 	:param theta: the rotation angle
 	:return: phase rotation gate for 1 qubit, rotating by theta
 	"""
-
-	#return MatrixGate(1, [[1, 0] [0, cos(theta) + sin(theta)*j]])
-	return MatrixGate(1, [[1, 0], [0, np.exp(theta)]])
+	return MatrixGate(1, [[1, 0], [0, np.exp( theta*1j )]])
 
 
 
@@ -22,7 +20,6 @@ Matrix representation is:
  ___
 """
 pauli_x = MatrixGate(1, [[0, 1], [1, 0]])
-
 
 """
 Pauli Y gate for 1 qubit
@@ -42,12 +39,8 @@ Matrix representation is:
 pauli_z = MatrixGate(1, [[1,0],[0,-1]] )
 
 
-
 """
 Hadamard gate for 1 qubit
 """
 s2 = 2**(-.5)
 hadamard = MatrixGate(1, [[s2, s2], [s2, -s2]])
-
-
-print(pauli_x)
