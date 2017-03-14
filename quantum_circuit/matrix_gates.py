@@ -36,24 +36,6 @@ class Gate(AbstractGate):
 
     @classmethod
     def controlled_u(cls, qubit_count, u, apply_qubits, control_qubits):
-
-        """
-        Jacob attempt:
-        operations_list =[] #list of operations, with index corresponding to the qubit being operated on
-        for i in range(qubit_count):
-            if control_qubits.contains(i):
-                operations_list.append("control") #maybe don't use strings, but some control matrix call?
-            else if apply_qubits.contains(i):
-                operations_list.append("apply") #maybe append u instead?
-            else:
-                operations_list.append("identity") #if not a control or apply qubit, nothing happens
-
-        for i in range(qubit_count):
-            if operations_list[i] == "control":
-
-            np.kronecker(operations_list) #not exactly the code, but apply 1-qubit gates in the order determined in the loop above.
-
-        """
         """ Create a controlled-U gate, given the matrix and the used qubits.
 
         Example:
@@ -105,6 +87,72 @@ class Gate(AbstractGate):
             of u. If all control gates are true, u is applied to these qubits.
         :param control_qubits: List of integers, specifying control qubits.
         :return: Gate representing the full operation.
+        """
+        """
+        --[C]--
+        --[C]--
+        --[X]--
+        where [C] - control, [X] - Pauli X gate
+        The matrix for the circuit above is given by:
+        I (x) P1 (x) P1 + I (x) P0 (x) P1 + I (x) P1 (x) P0 + X (x) P0 (x) P0
+        """
+        """
+        P0 = [[0,0],[0,1]]
+        P1 = [[1,0],[0,0]]
+        I = [[1,0],[0,1]]
+
+        if 0 in control_qubits:
+            # (P0, False, True) - (matrix applied, U applied, P1 applied)
+            m = [(P0, False, False), (P1, False, True)]
+        elif 0 in apply_qubits:
+            m = [(u.matrix, True, False), (I, False, False)]
+        else:
+            m = [(I, False, False)]
+
+        for i in range(1, qubit_count):
+            temp = [] #temporary array to hold the data for this iteration
+            if i in control_qubits: # apply P0 or P1
+                for j in range(len(m)):
+            # case when only P0 can be applied, e.g. ... (x) P0 (x) P0 (x) U
+                    if (m[j][1]):
+                        temp.append((np.kron(P0, m[j][0]), True, m[j][2]))
+            # case when only P1 can be applied, e.g. ... (x) P0 (x) P0 (x) I
+                    elif (i>apply_qubits[0] and not(m[j][2]) and \
+                        control_qubits[-1]==i):
+                        temp.append((np.kron(P1, m[j][0]), False, m[j][2]))
+                    else:  # else apply both
+                        temp.append((np.kron(P0, m[j][0]), m[j][1], m[j][2]))
+                        temp.append((np.kron(P1, m[j][0]), m[j][1], True))
+            elif i in apply_qubits:  # apply U or I
+                for j in range(len(m)):
+                    # if not the 1st qubit with gate applied
+                    if (i > apply_qubits[0]):
+                        # if U was used -> apply U
+                        if (m[j][1]):
+                            temp.append((np.kron(u.matrix, m[j][0]), True, \
+                            m[j][2]))
+                        # if I was used -> apply I
+                        else:
+                            temp.append((np.kron(I, m[j][0]), True, m[j][2]))
+                    else:
+                        # If P1 was applied -> apply I
+                        if (m[j][2]):
+                            temp.append((np.kron(I, m[j][0]), m[j][1], \
+                            m[j][2]))
+                        # If all P0 matrices were applied
+                        elif (i > control_qubits[-1]):
+                            temp.append((np.kron(u.matrix, m[j][0]), True, \
+                            m[j][2]))
+                        else:
+                            temp.append((np.kron(u.matrix, m[j][0]), True, \
+                            m[j][2]))
+                            temp.append((np.kron(I,m[j][0]), m[j][1], m[j][2]))
+            else: # no gate -> apply I
+                for j in range(len(m)):
+                    temp.append((np.kron(I, m[j][0]), m[j][1], m[j][2]))
+            m = temp
+
+        return Gate(qubit_count, sum([m[i][0] for i in range(len(m))]))
         """
         fn_gate = FunctionalGate.controlled_u(qubit_count, u,
                                               apply_qubits, control_qubits)
