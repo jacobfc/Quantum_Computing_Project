@@ -1,6 +1,7 @@
 from unittest import TestCase
 #from .functional_gates import Gate as FunctionalGate
-from matrix_gates import Gate as MatrixGate
+from .matrix_gates import Gate as MatrixGate
+from .mainframe import State
 import numpy as np
 
 def create_rotation_gate(theta):
@@ -27,9 +28,55 @@ def create_gate(qubit_count, gate_list):
 	return MatrixGate(qubit_count, gate)
 
 """
+Phase flip gate
+
+Example for a key = 001
+(the rightmost digit represents 0th qubit)
+|1> -----Z-----
+|0> --X--C--X--
+|0> --X--C--X--
+
+Need to add X gates around zero states
+Middle line is controlled Z gate.
+Does not mater to which qubit Z gate is applied.
+
+Do all this or simply create an identity matrix and change [key][key] to -1?
+"""
+def phase_flip_gate(qubit_count, key):
+    gate_list = []
+    # add X gates around zero states
+    for i in range(qubit_count):
+        if (key & (0b1 << i)) == 0:
+            gate_list.append(pauli_x)
+        else:
+            gate_list.append(identity)
+
+    gate_X = create_gate(qubit_count, gate_list)
+    gate_flip = MatrixGate.controlled_u(qubit_count, pauli_z, [0], \
+				list(range(1, qubit_count)))
+    return gate_X * gate_flip * gate_X
+
+"""
+Grover diffusion operator
+Inverts around the mean
+"""
+def diffusion_gate(qubit_count):
+	# create matrix to apply Hadamard to every qubit
+	gate_list = [hadamard for i in range(qubit_count)]
+	H_n = create_gate(qubit_count, gate_list)
+	# create matrix to apply identity to every qubit
+	gate_list = [identity for i in range(qubit_count)]
+	I_n = create_gate(qubit_count, gate_list)
+	# create the matrix Z0 = 2|0><0|-I
+	zero_state = State.from_basis_state(1 << qubit_count, 0)
+	Z0 = MatrixGate(qubit_count, 2*np.outer(zero_state, zero_state) - I_n.matrix)
+	# diffusion gate is defined as H Z0 H
+	return (H_n * Z0 * H_n)
+
+"""
 Empty gate - identity matrix
 """
-I = MatrixGate(1, [[1, 0], [0, 1]])
+identity = MatrixGate(1, [[1, 0], [0, 1]])
 
 """
 Pauli X gate for 1 qubit
