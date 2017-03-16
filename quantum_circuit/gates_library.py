@@ -1,6 +1,6 @@
 from unittest import TestCase
 #from .functional_gates import Gate as FunctionalGate
-from .matrix_gates import Gate as MatrixGate
+from matrix_gates import Gate as MatrixGate
 import numpy as np
 
 def create_rotation_gate(theta):
@@ -14,7 +14,22 @@ def create_rotation_gate(theta):
 	"""
 	return MatrixGate(1, [[1, 0], [0, np.exp( theta*1j )]])
 
+# Method to merge gates (using tensor product) into a larger one
+def create_gate(qubit_count, gate_list):
+	"""
+	:param qubit_count: number of qubits
+	:param gate_list: list of applied gates
+	:return: joint gate
+	"""
+	gate = [[1]]
+	for i in range(qubit_count):
+		gate = np.kron(gate_list[i].matrix, gate)
+	return MatrixGate(qubit_count, gate)
 
+"""
+Empty gate - identity matrix
+"""
+I = MatrixGate(1, [[1, 0], [0, 1]])
 
 """
 Pauli X gate for 1 qubit
