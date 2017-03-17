@@ -13,7 +13,6 @@ the representation in the computational basis would be
 Therefore |6> = |110> = [0, 1, 1].
 """
 
-
 class Gate(AbstractGate):
     def __init__(self, qubit_count, matrix):
         self._qubit_count = qubit_count
@@ -182,3 +181,6 @@ class Gate(AbstractGate):
             return Gate(self.qubit_count, np.dot(self.matrix, gate2.matrix))
         else:
             return gate2 * self
+
+    def __sub__(self, gate2):
+        return self.matrix - gate2.matrix
