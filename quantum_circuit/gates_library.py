@@ -79,7 +79,7 @@ Empty gate - identity matrix
 identity = MatrixGate(1, [[1, 0], [0, 1]])
 
 """
-Pauli X gate for 1 qubit
+Pauli X gate (aka NOT) for 1 qubit
 Matrix representation is:
 /0 1\
 \1 0/
