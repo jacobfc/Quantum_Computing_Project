@@ -3,6 +3,70 @@ from .mainframe import Gate as AbstractGate
 from .mainframe import State
 
 
+def mul(iterator):
+    res = 1
+    for i in iterator:
+        res *= i
+    return res
+
+
+def _clear_bits(basis_state, apply_qubits):
+    return basis_state - sum(1 << i for i in apply_qubits) & basis_state
+
+
+def _extract_sub_basis_state(basis_state, qubits):
+    """ Extract state of qubits in specified order, given in computational basis
+
+    Since the input is in basis state, and the basis states of system only
+    containing the sublist of qubits are a subset of the full basis,
+    the state we look for is a basis state as well. This means we can
+    return an integer here, instead of a full state.
+
+    :param basis_state:
+    :param qubits:
+    :return: Integer, representing state of
+    """
+    return sum(1 << i
+               for i in range(len(qubits))
+               # if i-th apply qubit is set
+               if basis_state & (1 << qubits[i]) != 0)
+
+
+def _insert_sub_bit_superpos(basis_size, state, insert_state, apply_qubits):
+    """
+
+    :param basis_size:
+    :param state:
+    :param insert_state: int, in basis of size 2 ** len(apply_qubits)
+    :param apply_qubits:
+    :return:
+    """
+
+    out_state_raw = np.zeros(basis_size, np.complex64)
+
+    # set apply qubits to zero
+    empty_apply = _clear_bits(state, apply_qubits)
+
+    # iterate over all output states
+    for k in range(len(insert_state)):
+        # transfer bit occupation of basis state from u's basis
+        # back to the full basis
+        set_apply = sum(1 << apply_qubits[i]  # value of ith qubit
+                        # iterate over apply qubits
+                        for i in range(len(apply_qubits))
+                        # for first bit, add 2**0 every second entry
+                        # for nth bit, add 2**n every 2**n-th entry
+                        if (i + 1) & k)  # set 1 every 2nd, 4th, ...
+        out_state_raw[set_apply + empty_apply] = insert_state[k]
+
+    return State(out_state_raw)
+
+
+def _is_set(i, k):
+    # not sure this is actually the most efficient implementation
+    return (1 << i) & k != 0
+
+
 class Gate(AbstractGate):
     def __init__(self, qubit_count, _eval_bs):
         self._basis_size = 1 << qubit_count
@@ -19,6 +83,30 @@ class Gate(AbstractGate):
     @property
     def basis_size(self):
         return self._basis_size
+
+    @classmethod
+    def multi_gate(cls, qubit_count, gate, apply_qubits):
+        """ Apply gate to multiple qubits at once.
+
+        :param qubit_count:
+        :param apply_qubits:
+        :param gate:
+        :return:
+        """
+
+        def _eval_bs(basis_state):
+            out_states = [gate(_extract_sub_basis_state(basis_state, [qi]))
+                          for qi in apply_qubits]
+
+            # compute amplitudes in computational basis according to
+            # qubit order in apply_qubits
+            # note here that boolean is implicitly cast to int
+            out_state = [mul(out_states[i][_is_set(i, k)]
+                             for i in range(len(out_states)))
+                         for k in range(1 << len(apply_qubits))]
+
+            return _insert_sub_bit_superpos(
+                1 << qubit_count, basis_state, out_state, apply_qubits)
 
     @classmethod
     def controlled_u(cls, qubit_count, u, apply_qubits, control_qubits):
@@ -58,29 +146,14 @@ class Gate(AbstractGate):
                 # Represent apply gates as a state in u's computational basis.
                 # Since u's basis is a subset of the full basis,
                 # and we handle a basis_state, this is also a basis state
-                u_input_bs = sum(1 << i
-                                 for i in range(len(apply_qubits))
-                                 # if i-th apply qubit is set
-                                 if basis_state & (1 << apply_qubits[i]) != 0)
+                u_input_bs = _extract_sub_basis_state(basis_state, apply_qubits)
                 # as opposed to u_input_bs (int) this is a full state
                 u_out_state = u.eval_bs(u_input_bs)
 
                 # now the result in u_out_state has to be incorporated with
                 # the rest of the qubits (which remain unchanged)
-
-                out_state_raw = np.zeros(basis_size, np.complex64)
-
-                # set apply qubits to zero
-                empty_apply = basis_state - \
-                    (sum(1 << i for i in apply_qubits) & basis_state)
-
-                for k in range(len(u_out_state)):
-                    set_apply = sum(1 << apply_qubits[i]
-                                    for i in range(len(apply_qubits))
-                                    if (i + 1) & k)  # set 1 every 2nd, 4th, ...
-                    out_state_raw[set_apply + empty_apply] = u_out_state[k]
-
-                return State(out_state_raw)
+                return _insert_sub_bit_superpos(
+                    basis_size, basis_state, u_out_state, apply_qubits)
 
         return cls(qubit_count, _eval_bs)
 
