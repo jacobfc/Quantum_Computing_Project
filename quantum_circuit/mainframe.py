@@ -16,7 +16,7 @@ class State(object):
 
     @classmethod
     def from_basis_state(cls, basis_size, basis_state):
-        state = np.zeros(basis_size, np.float64)
+        state = np.zeros(basis_size, np.complex64)
         state[basis_state] = 1.0
         return State(state)
 
