@@ -59,7 +59,7 @@ class State(object):
         return self.amplitudes.__iter__()
 
     def __str__(self):
-        format_c = lambda c: "(%.3f + i %.3f)" % (c.real, c.imag)
+        format_c = lambda c: "(%.3f + j %.3f)" % (c.real, c.imag)
         return " + ".join("%s |%d>" % (format_c(self.amplitudes[i]), i)
                           for i in range(self.basis_size)
                           if self.amplitudes[i] != 0)
