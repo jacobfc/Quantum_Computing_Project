@@ -1,5 +1,4 @@
 import numpy as np
-import abc
 
 
 class State(object):
@@ -9,7 +8,7 @@ class State(object):
         self.qubit_count = int(np.log2(self.basis_size))
 
         # assert initial_state has a power of two number of entries
-        assert 2**self.qubit_count == self.basis_size
+        assert 2 ** self.qubit_count == self.basis_size
 
     def norm(self):
         self.amplitudes.dot(self.amplitudes)
@@ -56,28 +55,3 @@ class State(object):
                           for i in range(self.basis_size)
                           if self.amplitudes[i] != 0)
 
-
-class Gate(metaclass=abc.ABCMeta):
-    @property
-    @abc.abstractproperty
-    def qubit_count(self):
-        return
-
-    @property
-    @abc.abstractproperty
-    def basis_size(self):
-        return -1
-
-    @abc.abstractmethod
-    def eval_bs(self, basis_state):
-        """ Apply gate to basis state as input.
-
-        :param basis_state: Integer representing a basis state in computational
-            basis.
-        :return: State
-        """
-        return
-
-    @abc.abstractmethod
-    def __call__(self, state):
-        return
