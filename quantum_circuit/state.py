@@ -14,8 +14,8 @@ class State(object):
         self.amplitudes.dot(self.amplitudes)
 
     @classmethod
-    def from_basis_state(cls, basis_size, basis_state):
-        state = np.zeros(basis_size, np.complex64)
+    def from_basis_state(cls, qubit_count, basis_state):
+        state = np.zeros(1 << qubit_count, np.complex64)
         state[basis_state] = 1.0
         return State(state)
 
@@ -27,6 +27,9 @@ class State(object):
 
     def __setitem__(self, key, value):
         return self.amplitudes.__setitem__(key, value)
+
+    def __eq__(self, other):
+        return np.array_equal(self.amplitudes, other.amplitudes)
 
     def __repr__(self):
         return self.amplitudes.__repr__()

@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # optimal number of iterations of Grover step
     n = math.floor(math.pi / (4*math.asin(basis_size ** (-1/2))))
     # initial state
-    state = State.from_basis_state(1 << qubit_count, 0)
+    state = State.from_basis_state(qubit_count, 0)
     # matrix to apply the phase flip
     flip_gate = g_lib.phase_flip_gate(qubit_count, key)
     # matrix to apply diffusion

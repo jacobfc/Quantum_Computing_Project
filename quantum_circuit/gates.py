@@ -148,7 +148,7 @@ class Gate(metaclass=abc.ABCMeta):
             """
             # if not all control qubits 1 => identity
             if basis_state & control_mask != control_mask:
-                return State.from_basis_state(basis_size, basis_state)
+                return State.from_basis_state(qubit_count, basis_state)
             else:
                 # Represent apply gates as a state in u's computational basis.
                 # Since u's basis is a subset of the full basis,
