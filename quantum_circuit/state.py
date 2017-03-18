@@ -29,7 +29,7 @@ class State(object):
         return self.amplitudes.__setitem__(key, value)
 
     def __eq__(self, other):
-        return np.array_equal(self.amplitudes, other.amplitudes)
+        return np.array_equal(self, other)
 
     def __repr__(self):
         return self.amplitudes.__repr__()
