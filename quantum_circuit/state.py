@@ -43,11 +43,17 @@ class State(object):
             return State(self.amplitudes)
         return State(self.amplitudes + other.amplitudes)
 
+    def __sub__(self, other):
+        return State(self.amplitudes - other.amplitudes)
+
     def __mul__(self, other):
         return State(self.amplitudes.__mul__(other))
 
     def __rmul__(self, other):
         return State(self.amplitudes.__rmul__(other))
+
+    def __truediv__(self, number):
+        return State(self.amplitudes / number)
 
     def __iter__(self):
         return self.amplitudes.__iter__()
