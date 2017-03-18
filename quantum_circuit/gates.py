@@ -232,7 +232,7 @@ class MatrixGate(Gate):
         return self._basis_size
 
     def __call__(self, state):
-        return np.dot(self.matrix, state.amplitudes)
+        return State(np.dot(self.matrix, state.amplitudes))
 
     def __repr__(self):
         return self.matrix.__repr__()
@@ -260,7 +260,7 @@ def _is_set(i, k):
 
 
 def _clear_bits(basis_state, apply_qubits):
-    return basis_state - sum(1 << i for i in apply_qubits) & basis_state
+    return basis_state - (sum(1 << i for i in apply_qubits) & basis_state)
 
 
 def _extract_sub_basis_state(basis_state, qubits):
