@@ -41,8 +41,15 @@ class Gate(metaclass=abc.ABCMeta):
         return
 
     @classmethod
-    @abc.abstractclassmethod
     def from_eval_bs(cls, qubit_count, _eval_bs):
+        """
+
+        Must be overridden in classes that inherit from Gate
+
+        :param qubit_count:
+        :param _eval_bs:
+        :return:
+        """
         # by default use functional gate here
         return FunctionalGate.from_eval_bs(qubit_count, _eval_bs)
 
