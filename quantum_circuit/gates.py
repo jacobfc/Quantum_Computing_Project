@@ -63,13 +63,13 @@ class Gate(metaclass=abc.ABCMeta):
         :return:
         """
         def _eval_bs(basis_state):
-            out_states = [gate(_extract_sub_basis_state(basis_state, [qi]))
+            out_states = [gate.eval_bs(_extract_sub_bs(basis_state, [qi]))
                           for qi in apply_qubits]
 
             # compute amplitudes in computational basis according to
             # qubit order in apply_qubits
             # note here that boolean is implicitly cast to int
-            out_state = [mul(out_states[i][_is_set(i, k)]
+            out_state = [mul(out_states[i][int(_is_set(i, k))]
                              for i in range(len(out_states)))
                          for k in range(1 << len(apply_qubits))]
 
@@ -160,7 +160,7 @@ class Gate(metaclass=abc.ABCMeta):
                 # Represent apply gates as a state in u's computational basis.
                 # Since u's basis is a subset of the full basis,
                 # and we handle a basis_state, this is also a basis state
-                u_input_bs = _extract_sub_basis_state(basis_state, apply_qubits)
+                u_input_bs = _extract_sub_bs(basis_state, apply_qubits)
                 # as opposed to u_input_bs (int) this is a full state
                 u_out_state = u.eval_bs(u_input_bs)
 
@@ -263,7 +263,7 @@ def _clear_bits(basis_state, apply_qubits):
     return basis_state - (sum(1 << i for i in apply_qubits) & basis_state)
 
 
-def _extract_sub_basis_state(basis_state, qubits):
+def _extract_sub_bs(basis_state, qubits):
     """ Extract state of qubits in specified order, given in computational basis
 
     Since the input is in basis state, and the basis states of system only
