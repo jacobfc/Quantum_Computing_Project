@@ -11,7 +11,10 @@ class State(object):
         assert 2 ** self.qubit_count == self.basis_size
 
     def norm(self):
-        return self.amplitudes.dot(self.amplitudes).real
+        return abs(np.conj(self.amplitudes).dot(self.amplitudes))
+
+    def prob_of_bs(self, bs):
+        return abs(np.square(self[bs])) / self.norm()
 
     @classmethod
     def from_basis_state(cls, qubit_count, basis_state):
