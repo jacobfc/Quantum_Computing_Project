@@ -20,6 +20,23 @@ class State(object):
     def prob_of_state(self, state):
         return np.conj(self).dot(state).real / (self.norm() * state.norm())
 
+    def random_measure_bs(self,):
+        """ Select a basis state with probabilities according to amplitudes.
+
+        Make a random choice on the basis states each weighted with
+        the probability of finding the system in that state
+        (i.e. amplitude squared).
+
+        :return:
+        """
+        sample = np.random.random_sample()
+        bs = 0
+        acc = self.prob_of_bs(bs)
+        while acc < sample:
+            bs += 1
+            acc += self.prob_of_bs(bs)
+        return bs
+
     @classmethod
     def from_basis_state(cls, qubit_count, basis_state):
         state = np.zeros(1 << qubit_count, np.complex64)
@@ -70,4 +87,3 @@ class State(object):
         return " + ".join("%s |%d>" % (format_c(self.amplitudes[i]), i)
                           for i in range(self.basis_size)
                           if self.amplitudes[i] != 0)
-
