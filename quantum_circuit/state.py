@@ -2,10 +2,23 @@ import numpy as np
 
 
 class State(object):
-    def __init__(self, initial_state):
-        # The state, represented as amplitudes of its constituent basis states.
-        # Typecast because the amplitudes can be complex
-        self.amplitudes = np.array(initial_state, np.complex64)
+    def __init__(self, initial_state, dtype=np.complex64):
+        """ Initialize state given a set of amplitudes.
+
+        Example:
+        >>> s = State([1, 0, 0, 0])
+        >>> s
+        array([ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j], dtype=complex64)
+        >>> print(s)
+
+
+
+        :param initial_state: Iterable, specifying amplitude for
+            each basis state.
+        :param dtype: Numeric type to be used for amplitudes.
+        """
+        # The state is represented as amplitudes of constituent basis states.
+        self.amplitudes = np.array(initial_state, dtype)
         self.basis_size = len(self.amplitudes)
         # For n qubits, there are 2**n basis states
         self.qubit_count = int(np.log2(self.basis_size))
@@ -15,9 +28,9 @@ class State(object):
         assert 1 << self.qubit_count == self.basis_size
 
     def norm(self):
-        """
+        """ Returns the sum of the squared amplitudes of the state.
 
-        :return: Returns the square amplitude of the state
+        :return: np.float32,
         """
         # .real is necessary because norm should be a float
         return np.conj(self).dot(self).real
@@ -73,17 +86,19 @@ class State(object):
         return bs
 
     @classmethod
-    def from_basis_state(cls, qubit_count: int, basis_state: int):
-        state = np.zeros(1 << qubit_count, np.complex64)
-        """
-        Creates a State object that is a basis state
+    def from_basis_state(cls, qubit_count: int, basis_state: int,
+                         dtype: type = np.complex64):
+        """ Creates a State object that is a basis state, given its label.
+
         :param qubit_count: Number of qubits in the state
         :param basis_state: The basis state to create
+        :param dtype: Numeric type to use for amplitudes in state.
         :return: State object in the basis state specified
         """
+        state = np.zeros(1 << qubit_count, dtype)
         assert basis_state < 1 << qubit_count, 'Basis state is not valid.'
         state[basis_state] = 1.0
-        return State(state)
+        return State(state, dtype=dtype)
 
     def __len__(self):
         return self.basis_size
@@ -125,7 +140,39 @@ class State(object):
         return self.amplitudes.__iter__()
 
     def __str__(self):
-        format_c = lambda c: "(%.3f + j %.3f)" % (c.real, c.imag)
-        return " + ".join("%s |%d>" % (format_c(self.amplitudes[i]), i)
-                          for i in range(self.basis_size)
-                          if self.amplitudes[i] != 0)
+        parts = []
+
+        def sign(num):
+            return '+' if num > 0 else '-'
+
+        for amp, label in zip(self.amplitudes, range(self.basis_size)):
+            if amp == 0:
+                continue
+
+            rep = []    # [sign, number]
+            imag, real = amp.imag, amp.real
+
+            if imag == 0:
+                rep = [sign(real), '%.3f' % abs(real)]
+            elif real == 0:
+                rep = [sign(imag), '%.3f' % abs(imag)]
+            elif imag < 0:
+                if real < 0:
+                    rep = ['-', '(%.3f + j %.3f)' % (-real, -imag)]
+                else:
+                    rep = ['+', '(%.3f - j %.3f)' % (real, -imag)]
+            else:
+                rep = ['+', '(%.3f + j %.3f' % (real, imag)]
+
+            rep.append('|%d>' % label)
+
+            if len(parts) == 0:
+                if rep[0] == '-':
+                    parts.append('-'+rep[1])
+                    parts.append(rep[2])
+                else:
+                    parts.extend(rep[1:])
+            else:
+                parts.extend(rep)
+
+        return " ".join(parts)
