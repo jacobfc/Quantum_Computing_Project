@@ -248,6 +248,13 @@ class MatrixGate(Gate):
 
 
 def mul(iterator):
+    """ Equivalent to built-in sum for multiplication
+
+    Example: mul([2, 1,3]) == 2 * 1 * 3 == 6
+
+    :param iterator:
+    :return:
+    """
     res = 1
     for i in iterator:
         res *= i

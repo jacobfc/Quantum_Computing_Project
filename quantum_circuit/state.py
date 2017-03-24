@@ -8,7 +8,8 @@ class State(object):
         self.qubit_count = int(np.log2(self.basis_size))
 
         # assert initial_state has a power of two number of entries
-        assert 2 ** self.qubit_count == self.basis_size
+        # note: 1 << n == 2 ** n
+        assert 1 << self.qubit_count == self.basis_size
 
     def norm(self):
         # .real is necessary because norm should be a float
@@ -27,7 +28,21 @@ class State(object):
         the probability of finding the system in that state
         (i.e. amplitude squared).
 
-        :return:
+        To illustrate the implementation, consider the (2-qubit) state
+        with amplitudes [0.25, 0.25, 0, 0.5] = 0.25|0> + 0.25|1> + 0.5|3>.
+        The first step, conceptually, is to split the real numbers
+        between 0 and 1 into chunks with sizes according to the probabilities
+        of the basis states:
+        0.0   0.25   0.5   0.75 1.0
+        |     |      |     |    |
+        00000|11111||33333 33333
+        A random number (in [0, 1)) is generated and the basis state chosen
+        is the one to which the block belongs, the random number is found in.
+        By making blocks belonging to one basis state larger,
+        it gets more probable this basis state will be measured.
+
+        :return: int, label of the basis state (in computational basis)
+            the state was randomly chosen to collapse into (at measurement).
         """
         sample = np.random.random_sample()
         bs = 0
@@ -38,7 +53,8 @@ class State(object):
         return bs
 
     @classmethod
-    def from_basis_state(cls, qubit_count, basis_state):
+    def from_basis_state(cls, qubit_count: int, basis_state: int):
+        assert basis_state < 1 << qubit_count, 'Basis state is not valid.'
         state = np.zeros(1 << qubit_count, np.complex64)
         state[basis_state] = 1.0
         return State(state)
