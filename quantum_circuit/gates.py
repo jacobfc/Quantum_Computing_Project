@@ -8,7 +8,7 @@ class Gate(metaclass=abc.ABCMeta):
     @property
     @abc.abstractproperty
     def qubit_count(self):
-        return
+        return -1
 
     @property
     @abc.abstractproperty
@@ -27,6 +27,11 @@ class Gate(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def __call__(self, state):
+        """
+        Call a gate to act on a state
+        :param state: The state for the gate to act on
+        :return: The state resulting from the gate acting on the input state
+        """
         return
 
     @abc.abstractmethod
@@ -42,7 +47,7 @@ class Gate(metaclass=abc.ABCMeta):
 
     @classmethod
     def from_eval_bs(cls, qubit_count, _eval_bs):
-        """
+        """ Construct a gate given eval_bs (tells how gate acts on basis states)
 
         Must be overridden in classes that inherit from Gate
 
@@ -50,7 +55,7 @@ class Gate(metaclass=abc.ABCMeta):
         :param _eval_bs:
         :return:
         """
-        # by default use functional gate here
+        # by default use functional gate here (least overhead)
         return FunctionalGate.from_eval_bs(qubit_count, _eval_bs)
 
     @classmethod
@@ -194,6 +199,11 @@ class FunctionalGate(Gate):
         return self._basis_size
 
     def __call__(self, state):
+        """
+        Calls a gate on state. Does
+        :param state: State which the gate is acting on
+        :return: The result of the Gate acting on the State
+        """
         # simple implementation, may be overridden
         return sum(state[k] * self.eval_bs(k) for k in range(self.basis_size))
 
@@ -206,7 +216,7 @@ class MatrixGate(Gate):
     @classmethod
     def from_eval_bs(cls, qubit_count, _eval_bs):
         basis_size = 1 << qubit_count
-        mat = np.zeros((basis_size, basis_size), np.complex64)
+        mat = np.zeros((basis_size, basis_size), np.complex64) #Start with an empty (basis_size x basis_size) matrix
         for bs in range(basis_size):
             mat[:, bs] = _eval_bs(bs).amplitudes
 
@@ -255,6 +265,12 @@ def mul(iterator):
 
 
 def _is_set(i, k):
+    """
+
+    :param i: the index of the bit
+    :param k:
+    :return:
+    """
     # not sure this is actually the most efficient implementation
     return (1 << i) & k != 0
 
