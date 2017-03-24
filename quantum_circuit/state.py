@@ -3,8 +3,11 @@ import numpy as np
 
 class State(object):
     def __init__(self, initial_state):
+        # The state, represented as amplitudes of its constituent basis states.
+        # Typecast because the amplitudes can be complex
         self.amplitudes = np.array(initial_state, np.complex64)
         self.basis_size = len(self.amplitudes)
+        # For n qubits, there are 2**n basis states
         self.qubit_count = int(np.log2(self.basis_size))
 
         # assert initial_state has a power of two number of entries
@@ -12,13 +15,29 @@ class State(object):
         assert 1 << self.qubit_count == self.basis_size
 
     def norm(self):
+        """
+
+        :return: Returns the square amplitude of the state
+        """
         # .real is necessary because norm should be a float
         return np.conj(self).dot(self).real
 
     def prob_of_bs(self, bs):
+        """
+
+        :param bs: The basis state of interest
+        :return: The probability of the system being in the basis state
+            of interest
+        """
         return np.square(abs(self[bs])) / self.norm()
 
     def prob_of_state(self, state):
+        """
+
+        :param state: The state of interest (does NOT have to be a basis state,
+            can be any State object)
+        :return: The probability of the system being in the state of interest
+        """
         return np.conj(self).dot(state).real / (self.norm() * state.norm())
 
     def random_measure_bs(self,):
@@ -41,12 +60,13 @@ class State(object):
         By making blocks belonging to one basis state larger,
         it gets more probable this basis state will be measured.
 
-        :return: int, label of the basis state (in computational basis)
-            the state was randomly chosen to collapse into (at measurement).
+        :return: The basis state which the state was measured to be in
         """
-        sample = np.random.random_sample()
-        bs = 0
+
+        sample = np.random.random_sample()  # random number in [0, 1)
+        bs = 0  # start "checking" if it's in the 0th basis state
         acc = self.prob_of_bs(bs)
+        # if we haven't measured that state, keep checking the next states
         while acc < sample:
             bs += 1
             acc += self.prob_of_bs(bs)
@@ -54,8 +74,14 @@ class State(object):
 
     @classmethod
     def from_basis_state(cls, qubit_count: int, basis_state: int):
-        assert basis_state < 1 << qubit_count, 'Basis state is not valid.'
         state = np.zeros(1 << qubit_count, np.complex64)
+        """
+        Creates a State object that is a basis state
+        :param qubit_count: Number of qubits in the state
+        :param basis_state: The basis state to create
+        :return: State object in the basis state specified
+        """
+        assert basis_state < 1 << qubit_count, 'Basis state is not valid.'
         state[basis_state] = 1.0
         return State(state)
 
