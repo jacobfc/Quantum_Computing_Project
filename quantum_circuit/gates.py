@@ -227,6 +227,8 @@ class MatrixGate(Gate):
         self._qubit_count = qubit_count
         self._basis_size = 1 << qubit_count
         self.matrix = np.array(matrix, np.complex64)
+
+        #If there are N basis states, the matrix for the gate be an N x N matrix
         assert self._basis_size == self.matrix.shape[0]
         assert self._basis_size == self.matrix.shape[1]
 
