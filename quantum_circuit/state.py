@@ -2,16 +2,15 @@ import numpy as np
 
 
 class State(object):
-    def __init__(self, initial_state, dtype=np.complex64):
+    def __init__(self, initial_state, dtype=np.complex128):
         """ Initialize state given a set of amplitudes.
 
         Example:
-        >>> s = State([1, 0, 0, 0])
-        >>> s
-        array([ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j], dtype=complex64)
-        >>> print(s)
-
-
+            >>> s = State([1, 0, 0, 0])
+            >>> s
+            array([ 1.+0.j,  0.+0.j,  0.+0.j,  0.+0.j])
+            >>> print(s)
+            1.000 |0>
 
         :param initial_state: Iterable, specifying amplitude for
             each basis state.
@@ -30,30 +29,43 @@ class State(object):
     def norm(self):
         """ Returns the sum of the squared amplitudes of the state.
 
-        :return: np.float32,
+        :return: float, norm of the state vector
         """
         # .real is necessary because norm should be a float
-        return np.conj(self).dot(self).real
+        return np.sqrt(np.conj(self).dot(self).real)
 
-    def prob_of_bs(self, bs):
+    def is_normalized(self):
+        return np.isclose(self.norm(), 1)
+
+    def prob_of_bs(self, bs, normalize=True):
         """
 
-        :param bs: The basis state of interest
+        :param bs: The basis state of interest.
+        :param normalize: Normalize state before calculating amplitudes.
         :return: The probability of the system being in the basis state
-            of interest
+            of interest.
         """
-        return np.square(abs(self[bs])) / self.norm()
+        if normalize:
+            return np.square(abs(self[bs])) / np.conj(self).dot(self).real
+        else:
+            return np.square(abs(self[bs]))
 
-    def prob_of_state(self, state):
+    def prob_of_state(self, state, normalize=True):
         """
 
         :param state: The state of interest (does NOT have to be a basis state,
             can be any State object)
+        :param normalize: Normalize state before calculating amplitudes.
         :return: The probability of the system being in the state of interest
         """
-        return np.conj(self).dot(state).real / (self.norm() * state.norm())
+        if normalize:
+            # doing the calculation like this makes it more accurate
+            norm = np.conj(self).dot(self).real * np.conj(state).dot(state).real
+            return np.square(abs(np.conj(self).dot(state))) / norm
+        else:
+            return np.square(np.conj(self).dot(state).real)
 
-    def random_measure_bs(self,):
+    def random_measure_bs(self):
         """ Select a basis state with probabilities according to amplitudes.
 
         Make a random choice on the basis states each weighted with
@@ -87,7 +99,7 @@ class State(object):
 
     @classmethod
     def from_basis_state(cls, qubit_count: int, basis_state: int,
-                         dtype: type = np.complex64):
+                         dtype: type = np.complex128):
         """ Creates a State object that is a basis state, given its label.
 
         :param qubit_count: Number of qubits in the state
@@ -149,11 +161,10 @@ class State(object):
             if amp == 0:
                 continue
 
-            rep = []    # [sign, number]
             imag, real = amp.imag, amp.real
 
             if imag == 0:
-                rep = [sign(real), '%.3f' % abs(real)]
+                rep = [sign(real), '%.3f' % abs(real)]  # [sign, number]
             elif real == 0:
                 rep = [sign(imag), '%.3f' % abs(imag)]
             elif imag < 0:
@@ -168,7 +179,7 @@ class State(object):
 
             if len(parts) == 0:
                 if rep[0] == '-':
-                    parts.append('-'+rep[1])
+                    parts.append('-' + rep[1])
                     parts.append(rep[2])
                 else:
                     parts.extend(rep[1:])
