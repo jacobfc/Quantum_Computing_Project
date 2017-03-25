@@ -2,6 +2,74 @@ import numpy as np
 
 
 class State(object):
+    """ Data structure representing the general state of a set of qubits.
+
+    The state is represented via the amplitudes of each basis state.
+    With basis states (here) always refer to the computational basis.
+
+    The computational basis emerges from considering all individual settings
+    of the qubits. Each qubit can individually be on or off (up or down),
+    The total number of possible combinations is therefore 2 ^ qubit_count,
+    where qubit_count is the number of qubits. This would classically also be
+    the total number of possible configurations. Quantum mechanically, however,
+    the system can be in an arbitrary superposition of these states.
+    In the computational basis, we assign a number (label) to the
+    configurations, as one does in classical computing.
+    All states being down (off) corresponds to the value 0, the first bit up
+    and the rest down is 1, the second bit up and the rest down is 2, etc.
+
+
+    Example:
+        A system with 3 qubits has 2 ^ 3 = 8 basis states.
+        writing up as 1, down as 0 these states are
+        |0>|0>|0>, |0>|0>|1>, |0>|1>|0>, |0>|1>|1>, ...
+        (using order of computational basis)
+
+        For convenience we write |c>|b>|a> = |cba> where a, b, c in {0, 1}.
+        A basis state with label m in the computational basis is written |m>.
+        The basis states for our 3 qubit system are therefore
+        |000> = |0>, |001> = |1>, |010> = |2>
+        |011> = |3>, |100> = |4>, |101> = |5>
+        |110> = |6>, |111> = |7>.
+
+        This is exactly how numbers are represented in classical,
+        binary computers.
+
+    Generally, a state |..., n_1, n_0> = | (sum n_k * 2 ^ k) >,
+    where n_k in {0, 1} and k = 0, ..., qubit_count - 1.
+
+    Note that in the states of the computational basis, the values of different
+    qubits are not entangled. To represent a general state, including entangled
+    qubits, we must allow superpositions of these basis states.
+
+    Any state can be represented by specifying it's amplitudes regarding the
+    computational basis (linear algebra).
+
+    Example:
+        In a 2 qubit system (omitting a factor 1/sqrt(2) for normalization):
+        (|0> + |1>) |0> = |0> + |2>
+        would represented as State([s2, 0, s2, 0]) where s2 = 1/sqrt(2)
+
+        >>> s = State([1, 0, 1, 0])  # not normalized
+        >>> print(s)
+        1.000 |0> + 1.000 |2>
+        >>> s.prob_of_bs(1)  # no chance of measuring system in state |1>
+        0.0
+        >>> s.prob_of_bs(0)  # method automatically considers norm
+        0.5
+        >>> s.prob_of_state(State.from_basis_state(2, 0))  # same as above
+        0.5
+        >>> s = s / s.norm() # normalize state
+        >>> s.is_normalized()
+        True
+        >>> s.norm()
+        0.99999999999999989
+
+        In the last line, the limitation of this simulation become obvious:
+        The square root of two cannot be accurately be represented using floats.
+        This leads to a rounding error when calculating the norm.
+        To test equality in these cases, use np.close.
+    """
     def __init__(self, initial_state, dtype=np.complex128):
         """ Initialize state given a set of amplitudes.
 
