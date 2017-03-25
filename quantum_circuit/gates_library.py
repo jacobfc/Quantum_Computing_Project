@@ -56,8 +56,8 @@ def phase_flip_gate(qubit_count, key):
             gate_list.append(identity)
 
     gate_X = create_gate(qubit_count, gate_list)
-    gate_flip = MatrixGate.controlled_u(qubit_count, pauli_z, [0],
-                                        list(range(1, qubit_count)))
+    gate_flip = MatrixGate.controlled_gate(qubit_count, pauli_z, [0],
+                                           list(range(1, qubit_count)))
     return gate_X * gate_flip * gate_X
 
 

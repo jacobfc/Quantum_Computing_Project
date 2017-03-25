@@ -84,8 +84,8 @@ class Gate(metaclass=abc.ABCMeta):
         return cls.from_eval_bs(qubit_count, _eval_bs)
 
     @classmethod
-    def controlled_u(cls, qubit_count, u, apply_qubits, control_qubits):
-        """ Create a controlled-U gate, given the matrix and the used qubits.
+    def controlled_gate(cls, qubit_count, gate, apply_qubits, control_qubits):
+        """ Create a controlled-U gate, given the gate and the used qubits.
 
         Example:
             qubit_count = 3
@@ -130,7 +130,7 @@ class Gate(metaclass=abc.ABCMeta):
 
 
         :param qubit_count: Dimensionality of the gate ("number of wires").
-        :param u: Unitary matrix. Assumed to be given in computational basis,
+        :param gate: Unitary matrix. Assumed to be given in computational basis,
             using the order as in apply_qubits.
         :param apply_qubits: List of integers, length must fit dimensionality
             of u. If all control gates are true, u is applied to these qubits.
@@ -162,12 +162,12 @@ class Gate(metaclass=abc.ABCMeta):
             if basis_state & control_mask != control_mask:
                 return State.from_basis_state(qubit_count, basis_state)
             else:
-                # Represent apply gates as a state in u's computational basis.
-                # Since u's basis is a subset of the full basis,
+                # Represent apply gates as a state in gate's computational basis.
+                # Since gate's basis is a subset of the full basis,
                 # and we handle a basis_state, this is also a basis state
                 u_input_bs = _extract_sub_bs(basis_state, apply_qubits)
                 # as opposed to u_input_bs (int) this is a full state
-                u_out_state = u.eval_bs(u_input_bs)
+                u_out_state = gate.eval_bs(u_input_bs)
 
                 # now the result in u_out_state has to be incorporated with
                 # the rest of the qubits (which remain unchanged)
