@@ -1,5 +1,6 @@
 # from quantum_circuit.functional_gates import FunctionalGate
 from quantum_circuit.gates import MatrixGate
+from quantum_circuit.gates import FunctionalGate
 from quantum_circuit.state import State
 import numpy as np
 
@@ -15,8 +16,9 @@ def create_rotation_gate(theta):
     """
     return MatrixGate(1, [[1, 0], [0, np.exp(theta * 1j)]])
 
-
-# Method to merge gates (using tensor product) into a larger one
+"""
+Method to merge gates (using tensor product) into a larger one
+"""
 def create_gate(qubit_count, gate_list):
     """
     :param qubit_count: number of qubits
@@ -27,6 +29,23 @@ def create_gate(qubit_count, gate_list):
     for i in range(qubit_count):
         gate = np.kron(gate_list[i].matrix, gate)
     return MatrixGate(qubit_count, gate)
+
+"""
+Quantum Fourier Transform
+"""
+def QFT(qubit_count):
+    N = 1 << qubit_count # basis_size (number of rows and columns)
+    omega = np.exp(2.0 * np.pi * 1j / N) #Nth root of unity
+    #Construct the operation matrix
+    matrix = []
+    for i in range(N):
+        row = []
+        for j in range(N):
+            power = i * j
+            row.append(omega**power)
+        matrix.append(row)
+    matrix = matrix / np.sqrt(N) # Normalization factor
+    return MatrixGate(qubit_count, matrix)
 
 
 """
@@ -44,6 +63,7 @@ Does not mater to which qubit Z gate is applied.
 
 Do all this or simply create an identity matrix and change [key][key] to -1?
 """
+
 
 
 def phase_flip_gate(qubit_count, key):
