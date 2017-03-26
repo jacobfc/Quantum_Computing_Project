@@ -84,6 +84,7 @@ class State(object):
             each basis state.
         :param dtype: Numeric type to be used for amplitudes.
         """
+        self.dtype = dtype
         # The state is represented as amplitudes of constituent basis states.
         self.amplitudes = np.array(initial_state, dtype)
         self.basis_size = len(self.amplitudes)

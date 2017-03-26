@@ -5,8 +5,6 @@ from quantum_circuit.gates_library import hadamard
 
 from tests.testcase import BaseTestCase
 
-from numpy import complex64
-
 
 class TestGate(BaseTestCase):
     def generic_controlled_u_example(self, gate_type):
@@ -17,7 +15,7 @@ class TestGate(BaseTestCase):
         if gate_type != Gate:
             self.assertEqual(type(gate), gate_type)
 
-        s2 = complex64(2 ** -.5)
+        s2 = gate.dtype(2 ** -.5)
         # This example is the same as in the docstring of Gate.controlled_gate
         self.assertEqual(gate.eval_bs(0), [1, 0, 0, 0, 0, 0, 0, 0])
         self.assertEqual(gate.eval_bs(1), [0, s2, 0, s2, 0, 0, 0, 0])
