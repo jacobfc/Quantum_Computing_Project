@@ -117,3 +117,11 @@ Hadamard gate for 1 qubit
 """
 s2 = 2 ** (-.5)
 hadamard = MatrixGate(1, [[s2, s2], [s2, -s2]])
+
+"""
+Phase gate for 1 qubit
+Matrix repersentation is:
+/1 0\
+\0 i/
+"""
+phase = MatrixGate(1, [[1,0], [0,1j]])
