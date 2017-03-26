@@ -241,7 +241,7 @@ class State(object):
                 else:
                     rep = ['+', '(%.3f - j %.3f)' % (real, -imag)]
             else:
-                rep = ['+', '(%.3f + j %.3f' % (real, imag)]
+                rep = ['+', '(%.3f + j %.3f)' % (real, imag)]
 
             rep.append('|%d>' % label)
 
