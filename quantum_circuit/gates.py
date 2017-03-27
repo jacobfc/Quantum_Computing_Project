@@ -250,22 +250,34 @@ class FunctionalGate(Gate):
         :param dtype: Data type used in states and matrices (complex number).
         :return: Gate
         """
-        return cls(qubit_count, _eval_bs, dtype=dtype)
+        def _eval_state(state):
+            sum(state[k] * _eval_bs(k) for k in range(1 << qubit_count))
 
-    def __init__(self, qubit_count, _eval_bs, dtype=np.complex128):
+        return cls(qubit_count, _eval_bs, _eval_state, dtype=dtype)
+
+    @classmethod
+    def from_eval_state(cls, qubit_count, _eval_state, dtype=None):
+        def _eval_bs(bs):
+            return _eval_state(State.from_basis_state(qubit_count, bs))
+        return cls(qubit_count, _eval_bs, _eval_state, dtype=dtype)
+
+    def __init__(self, qubit_count, _eval_bs, _eval_state, dtype=np.complex128):
         """ Create a Functional gate from eval_bs function (see Gate.eval_bs).
 
         :type qubit_count: int
         :type _eval_bs: function
+        :type _eval_state: function
         :type dtype: type
         :param qubit_count: Number of qubits.
         :param _eval_bs: Function mapping basis state to output State
+        :param _eval_state: Function mapping full State to full output State
         :param dtype: Data type for constructing states (amplitudes)
         """
         self._dtype = dtype
         self._basis_size = 1 << qubit_count
         self._qubit_count = qubit_count
         self._eval_bs = _eval_bs
+        self._eval_state = _eval_state
 
     def eval_bs(self, basis_state):
         return self._eval_bs(basis_state)
@@ -284,7 +296,7 @@ class FunctionalGate(Gate):
         :param state: State which the gate is acting on
         :return: The result of the Gate acting on the State
         """
-        return sum(state[k] * self.eval_bs(k) for k in range(self.basis_size))
+        return self._eval_state(state)
 
     def __mul__(self, gate2):
         return FunctionalGate(self.qubit_count,
