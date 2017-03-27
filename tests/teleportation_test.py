@@ -12,6 +12,15 @@ from quantum_circuit.gates import MatrixGate
 import numpy as np
 import random
 
+from tests.testcase import BaseTestCase
+
+
+class TestShor(BaseTestCase):
+    def test_shor(self):
+        # run test and see if errors are thrown
+        main()
+
+
 def main():
     """
     This is a test to outline a simulation of the quantum teleportation concept
@@ -153,5 +162,6 @@ def main():
     
     bloch.visualise_qubit(s_new)
     
-main()
+if __name__ == '__main__':
+    main()
     
