@@ -277,6 +277,9 @@ class State(object):
     def __str__(self):
         parts = []
 
+        if self.norm() == 0:
+            return "0 |0>"
+
         def sign(num):
             return '+' if num > 0 else '-'
 
