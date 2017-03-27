@@ -33,9 +33,6 @@ def main():
 
     # create superposition by applying Hadamard to every qubit
     state = H_n(state)
-    print(flip_gate)
-    print(diff_gate)
-    print(H_n)
     # perform Grover step required number of times
     full = flip_gate * diff_gate
     for i in range(n - 1):
