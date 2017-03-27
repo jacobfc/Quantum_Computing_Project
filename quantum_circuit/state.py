@@ -100,8 +100,9 @@ class State(object):
 
         :return: float, norm of the state vector
         """
-        # .real is necessary because norm should be a float
-        return np.sqrt(np.conj(self).dot(self).real)
+        # .real is necessary because norm should be a float.
+        # (self * self).imag == 0, no information lost.
+        return np.sqrt((self * self).real)
 
     def is_normalized(self):
         return np.isclose(self.norm(), 1)
@@ -115,7 +116,7 @@ class State(object):
             of interest.
         """
         if normalize:
-            return np.square(abs(self[bs])) / np.conj(self).dot(self).real
+            return np.square(abs(self[bs])) / (self * self).real
         else:
             return np.square(abs(self[bs]))
 
@@ -129,8 +130,8 @@ class State(object):
         """
         if normalize:
             # doing the calculation like this makes it more accurate
-            norm = np.conj(self).dot(self).real * np.conj(state).dot(state).real
-            return np.square(abs(np.conj(self).dot(state))) / norm
+            norm = (self * self).real * (state * state).real
+            return np.square(abs(self * state)) / norm
         else:
             return np.square(np.conj(self).dot(state).real)
 
@@ -211,6 +212,15 @@ class State(object):
         return State(-self.amplitudes)
 
     def __mul__(self, other):
+        """ Multiply state and state or state and complex number
+
+        :param other: State or complex number.
+        :return: Depending on type of other:
+            complex number -> state with amplitudes element wise multiplied
+            state -> complex number <self|other>
+        """
+        if isinstance(other, State):
+            return np.conj(self).dot(other)
         return State(self.amplitudes.__mul__(other))
 
     def __rmul__(self, other):
