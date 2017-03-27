@@ -200,13 +200,15 @@ class State(object):
         return State(self.amplitudes + other.amplitudes)
 
     def __radd__(self, other):
-        # supporting sum
-        if other == 0:
+        if other == 0:  # supporting sum
             return State(self.amplitudes)
         return State(self.amplitudes + other.amplitudes)
 
     def __sub__(self, other):
         return State(self.amplitudes - other.amplitudes)
+
+    def __neg__(self):
+        return State(-self.amplitudes)
 
     def __mul__(self, other):
         return State(self.amplitudes.__mul__(other))
