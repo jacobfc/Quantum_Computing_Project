@@ -100,8 +100,9 @@ class State(object):
 
         :return: float, norm of the state vector
         """
-        # .real is necessary because norm should be a float
-        return np.sqrt(np.conj(self).dot(self).real)
+        # .real is necessary because norm should be a float.
+        # (self * self).imag == 0, no information lost.
+        return np.sqrt((self * self).real)
 
     def is_normalized(self):
         return np.isclose(self.norm(), 1)
@@ -115,7 +116,7 @@ class State(object):
             of interest.
         """
         if normalize:
-            return np.square(abs(self[bs])) / np.conj(self).dot(self).real
+            return np.square(abs(self[bs])) / (self * self).real
         else:
             return np.square(abs(self[bs]))
 
@@ -129,8 +130,8 @@ class State(object):
         """
         if normalize:
             # doing the calculation like this makes it more accurate
-            norm = np.conj(self).dot(self).real * np.conj(state).dot(state).real
-            return np.square(abs(np.conj(self).dot(state))) / norm
+            norm = (self * self).real * (state * state).real
+            return np.square(abs(self * state)) / norm
         else:
             return np.square(np.conj(self).dot(state).real)
 
@@ -190,29 +191,57 @@ class State(object):
     def __setitem__(self, key, value):
         return self.amplitudes.__setitem__(key, value)
 
-    def __eq__(self, other):
-        return np.array_equal(self, other)
+    def __eq__(self, state):
+        return np.array_equal(self, state)
 
     def __repr__(self):
         return self.amplitudes.__repr__()
 
-    def __add__(self, other):
-        return State(self.amplitudes + other.amplitudes)
+    def __add__(self, state):
+        return State(self + state)
 
     def __radd__(self, other):
-        # supporting sum
-        if other == 0:
-            return State(self.amplitudes)
-        return State(self.amplitudes + other.amplitudes)
+        """ Support addition to zero (as neutral element).
 
-    def __sub__(self, other):
-        return State(self.amplitudes - other.amplitudes)
+        Do not explicitly call this.
+
+        This method is needed to support the builtin sum method.
+        Adding a state to 0 will yield the state:
+        >>> s = State([0, 1])
+        >>> (0 + s) == s
+        True
+
+        Executing 'state + state' will always lead to __add__ being called.
+        Generally 'number + state' or 'state + number' is not supported,
+        as the meaning of these statements is ambiguous.
+
+        :param other: 0.
+        :return: State(self).
+        """
+        if other == 0:
+            return State(self)  # return a copy
+        return self + other  # code execution should never come to this point
+
+    def __sub__(self, state):
+        return State(self.amplitudes - state.amplitudes)
+
+    def __neg__(self):
+        return State(-self.amplitudes)
 
     def __mul__(self, other):
+        """ Multiply state and state or state and complex number
+
+        :param other: State or complex number.
+        :return: Depending on type of other:
+            complex number -> state with amplitudes element wise multiplied
+            state -> complex number <self|other>
+        """
+        if isinstance(other, State):
+            return np.conj(self).dot(other)
         return State(self.amplitudes.__mul__(other))
 
-    def __rmul__(self, other):
-        return State(self.amplitudes.__rmul__(other))
+    def __rmul__(self, number):
+        return State(self.amplitudes.__rmul__(number))
 
     def __truediv__(self, number):
         return State(self.amplitudes / number)
@@ -226,7 +255,7 @@ class State(object):
         def sign(num):
             return '+' if num > 0 else '-'
 
-        for amp, label in zip(self.amplitudes, range(self.basis_size)):
+        for amp, label in zip(self, range(self.basis_size)):
             if amp == 0:
                 continue
 

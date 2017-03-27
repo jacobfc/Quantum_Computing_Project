@@ -252,11 +252,8 @@ class MatrixGate(Gate):
         assert self._basis_size == self.matrix.shape[0]
         assert self._basis_size == self.matrix.shape[1]
 
-    def eval_bs(self, basis_state, need_copy=True):
-        if need_copy:
-            return State(np.copy(self.matrix[:, basis_state]))
-        else:
-            return State(self.matrix[:, basis_state])
+    def eval_bs(self, basis_state):
+        return State(self.matrix[:, basis_state])
 
     @property
     def qubit_count(self):
