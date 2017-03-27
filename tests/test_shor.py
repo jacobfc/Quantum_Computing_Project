@@ -49,7 +49,7 @@ def shor_quantum(N, m, n, i):
             input_register.amplitudes[j] = 0
 
     input_register /= math.sqrt(number)  # normalize the state
-    input_register = State(np.dot(input_register, QFT_n.matrix))  # apply qft
+    input_register = QFT_n(input_register)
     # Should return an integer number of the period of the function
     return input_register.random_measure_bs()
 
