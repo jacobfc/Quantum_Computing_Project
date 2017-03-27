@@ -75,7 +75,8 @@ def diffusion_gate(qubit_count):
     # create the matrix Z0 = 2|0><0|-I
     zero_state = State.from_basis_state(qubit_count, 0)
     Z0 = MatrixGate(qubit_count,
-                    2 * np.outer(zero_state, zero_state) - I_n.matrix)
+                    2 * np.outer(zero_state.amplitudes, \
+                    zero_state.amplitudes) - I_n.matrix)
     # diffusion gate is defined as H Z0 H
     return H_n * Z0 * H_n
 

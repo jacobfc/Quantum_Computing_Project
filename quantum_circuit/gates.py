@@ -337,6 +337,10 @@ class MatrixGate(Gate):
         return self._basis_size
 
     def __call__(self, state):
+        """ Allows a Gate to be called on a State object
+        :param state: the State object the gate is being called on
+        :return: the State object resulting from the operation of the gate
+        """
         return State(np.dot(self.matrix, state.amplitudes))
 
     def __repr__(self):

@@ -222,6 +222,11 @@ class State(object):
         return self.amplitudes.__repr__()
 
     def __add__(self, state):
+        """Add the amplitudes of two states
+
+        :param state: the state object being added
+        :return: State object resulting from the addition
+        """
         return State(self.amplitudes + state.amplitudes)
 
     def __radd__(self, other):
@@ -247,9 +252,18 @@ class State(object):
         return self + other  # code execution should never come to this point
 
     def __sub__(self, state):
+        """Subtract the amplitudes of one state by the amplitudes of another state
+
+        :param state: the State object being subtracted by
+        :return: State resulting from the subtraction
+        """
         return State(self.amplitudes - state.amplitudes)
 
     def __neg__(self):
+        """
+
+        :return: State, with each amplitude element multiplied by -1
+        """
         return State(-self.amplitudes)
 
     def __mul__(self, other):
