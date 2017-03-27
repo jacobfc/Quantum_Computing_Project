@@ -257,6 +257,17 @@ class FunctionalGate(Gate):
 
     @classmethod
     def from_eval_state(cls, qubit_count, _eval_state, dtype=None):
+        """ Create a FunctionalGate given a function mapping between States.
+
+        :type qubit_count: int
+        :type _eval_state: function
+        :type dtype: type
+        :param qubit_count: Number of qubits.
+        :param _eval_state: Function computing the output State of the gate,
+            given an input State.
+        :param dtype: Complex number type used to create States.
+        :return: State
+        """
         def _eval_bs(bs):
             return _eval_state(State.from_basis_state(qubit_count, bs))
         return cls(qubit_count, _eval_bs, _eval_state, dtype=dtype)
@@ -350,6 +361,7 @@ class MatrixGate(Gate):
 
     def __call__(self, state):
         """ Allows a Gate to be called on a State object
+
         :param state: the State object the gate is being called on
         :return: the State object resulting from the operation of the gate
         """
@@ -394,6 +406,23 @@ def _is_set(i, k):
 
 
 def _clear_bits(basis_state, apply_qubits):
+    """ Set bits specified in apply_qubits to zero in the int basis_state.
+
+    Example:
+        basis_state = 6, apply_qubits = [0, 1]
+        6 == 0b0110 # number in binary representation
+        calling this method returns sets the two right-most bits to zero:
+        return -> 0b0100 == 4
+
+        >>> _clear_bits(6, [0, 1])
+        4
+
+    :type basis_state: int
+    :type apply_qubits: [int]
+    :param basis_state: An arbitrary integer.
+    :param apply_qubits: Bits to set to zero.
+    :return: int
+    """
     return basis_state - (sum(1 << i for i in apply_qubits) & basis_state)
 
 
@@ -405,9 +434,15 @@ def _extract_sub_bs(basis_state, qubits):
     the state we look for is a basis state as well. This means we can
     return an integer here, instead of a full state.
 
-    :param basis_state:
-    :param qubits:
-    :return: Integer, representing state of
+    Example:
+        >>> _extract_sub_bs(7, [3, 0, 1]) # 7 = 0b0111 -> 0b[1][0][3] = 0b110
+        6
+
+    :param basis_state: int
+    :param qubits: Indices of qubits to extract from basis_state, in order of
+        ascending significance.
+    :return: Integer, representing state of qubits in the overall
+        state basis_state.
     """
     return sum(1 << i
                for i in range(len(qubits))
@@ -415,24 +450,34 @@ def _extract_sub_bs(basis_state, qubits):
                if basis_state & (1 << qubits[i]) != 0)
 
 
-def _insert_sub_bit_superpos(basis_size, state, insert_state, apply_qubits,
+def _insert_sub_bit_superpos(basis_size, bs, insert_state, apply_qubits,
                              dtype=np.complex128):
-    """
+    """ Insert full state of subset of qubits into a full-sized basis_size.
 
-    :param basis_size:
-    :param state:
+    Sets the bits in bs corresponding to insert_state to all possible
+    assignments and weight them in a sum given the amplitudes of insert_state.
+
+    :type basis_size: int
+    :type bs: int
+    :type insert_state: State
+    :type apply_qubits: [int]
+    :type dtype: type
+    :param basis_size: Size of the basis bs.
+    :param bs: basis state.
     :param insert_state: int, in basis of size 2 ** len(apply_qubits)
-    :param apply_qubits:
+    :param apply_qubits: Indices of qubits, insert_state corresponds to.
+        Listed in order of ascending significance.
+    :param dtype: Complex data type.
     :return:
     """
     out_state_raw = np.zeros(basis_size, dtype)
 
     # set apply qubits to zero
-    empty_apply = _clear_bits(state, apply_qubits)
+    empty_apply = _clear_bits(bs, apply_qubits)
 
     # iterate over all output states
     for k in range(insert_state.basis_size):
-        # transfer bit occupation of basis state from u's basis
+        # transfer bit occupation of basis bs from u's basis
         # back to the full basis
         set_apply = sum(1 << apply_qubits[i]  # value of ith qubit
                         # iterate over apply qubits
