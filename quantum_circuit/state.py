@@ -105,6 +105,12 @@ class State(object):
         return np.sqrt((self * self).real)
 
     def is_normalized(self):
+        """Checks if a State object is (close to being) normalized (sum of squared amplitudes == 1)
+        Uses the numpy function isclose
+        :return: Returns the Bool:
+                    True if the object is close to being normalized
+                    False if the object is not close to being normalized
+        """
         return np.isclose(self.norm(), 1)
 
     def prob_of_bs(self, bs, normalize=True):
@@ -121,7 +127,7 @@ class State(object):
             return np.square(abs(self[bs]))
 
     def prob_of_state(self, state, normalize=True):
-        """
+        """The probability of a State being in particular State object (not necessarily a basis state)
 
         :param state: The state of interest (does NOT have to be a basis state,
             can be any State object)
@@ -219,9 +225,22 @@ class State(object):
         raise NotImplementedError()
 
     def __getitem__(self, item):
+        """Return an amplitude of 1 basis state in the State object
+
+        :param item: The basis state (int) to get the amplitude of
+                    (equivalent to the index in the array of amplitudes)
+        :return: The (complex) amplitude of the basis state
+        """
         return self.amplitudes[item]
 
     def __setitem__(self, key, value):
+        """Set an amplitude of 1 basis state in the State object
+
+        :param key: The basis state (int) to set the amplitude of
+                    (equivalent to the index in the array of amplitudes)
+        :param value: The (complex) value to set the amplitude to
+        :return: Nothing (modifies the State object being acted on)
+        """
         self.amplitudes[key] = value
 
     def __eq__(self, state):
@@ -235,7 +254,11 @@ class State(object):
         return True
 
     def __repr__(self):
-        return self.amplitudes.__repr__()
+        """The representation
+
+        :return:
+        """
+        return "State with amplitudes " + self.amplitudes.__repr__()
 
     def __add__(self, state):
         """Add the amplitudes of two states
@@ -276,7 +299,7 @@ class State(object):
         return State(self.amplitudes - state.amplitudes)
 
     def __neg__(self):
-        """
+        """The additive inverse of a State object (in terms of its amplitudes)
 
         :return: State, with each amplitude element multiplied by -1
         """
@@ -296,9 +319,20 @@ class State(object):
             return State(other * self.amplitudes)
 
     def __rmul__(self, number):
+        """Right multiplication of a state
+        Only implemented for a state and a number
+
+        :param number: Complex number being (right) multiplied by the state
+        :return: State object with amplitudes multiplied element-wise
+        """
         return self * number
 
     def __truediv__(self, number):
+        """Divide a the amplitudes of a State object by a (complex) number, element-wise
+
+        :param number: The (complex) number dividing the amplitudes
+        :return: The State object, with it's amplitudes divided
+        """
         return State(self.amplitudes / number)
 
     def __iter__(self):
