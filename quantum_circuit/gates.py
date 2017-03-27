@@ -114,14 +114,14 @@ class Gate(metaclass=abc.ABCMeta):
             |7> = |111> -> |1>(|0> - |1>)|1> = |5> - |7>
 
             so we can see the matrix representation of the whole gate would be
-             /1   0   0   0   0   0   0   0  \
-            | 0   s2  0   s2  0   0   0   0   |
-            | 0   0   1   0   0   0   0   0   |
-            | 0   s2  0   -s2 0   0   0   0   |
-            | 0   0   0   0   1   0   0   0   |
-            | 0   0   0   0   0   s2  0   s2  |
-            | 0   0   0   0   0   0   1   0   |
-             \0   0   0   0   0   s2  0   -s2/
+            |1   0   0   0   0   0   0   0  |
+            |0   s2  0   s2  0   0   0   0  |
+            |0   0   1   0   0   0   0   0  |
+            |0   s2  0   -s2 0   0   0   0  |
+            |0   0   0   0   1   0   0   0  |
+            |0   0   0   0   0   s2  0   s2 |
+            |0   0   0   0   0   0   1   0  |
+            |0   0   0   0   0   s2  0   -s2|
             where s2 = 1/sqrt(2).
 
         Specification of the U matrix in relation with apply_qubits:
@@ -173,7 +173,7 @@ class Gate(metaclass=abc.ABCMeta):
             if basis_state & control_mask != control_mask:
                 return State.from_basis_state(qubit_count, basis_state)
             else:
-                # Represent apply gates as a state in gate's computational basis.
+                # Represent apply gates as a state in gate's computational basis
                 # Since gate's basis is a subset of the full basis,
                 # and we handle a basis_state, this is also a basis state
                 u_input_bs = _extract_sub_bs(basis_state, apply_qubits)
@@ -261,7 +261,7 @@ class MatrixGate(Gate):
         self._basis_size = 1 << qubit_count
         self.matrix = np.array(matrix, dtype)
 
-        #If there are N basis states, the matrix for the gate be an N x N matrix
+        # If there are N basis states the matrix for the gate be an N x N matrix
         assert self._basis_size == self.matrix.shape[0]
         assert self._basis_size == self.matrix.shape[1]
 
