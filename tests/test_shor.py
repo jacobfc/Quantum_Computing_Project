@@ -19,7 +19,7 @@ class TestShor(BaseTestCase):
 def shor_quantum(N, m, n, i):
     # Create input i-qubit register
     input_register = State.from_basis_state(i, 1)
-    # Apply QFT to put the states into uniform superposition
+    # Apply qft to put the states into uniform superposition
     input_register = State(np.dot(input_register, QFT_n.matrix))
 
     found = np.full(n, False)
@@ -49,7 +49,7 @@ def shor_quantum(N, m, n, i):
             input_register.amplitudes[j] = 0
 
     input_register /= math.sqrt(number)  # normalize the state
-    input_register = State(np.dot(input_register, QFT_n.matrix))  # apply QFT
+    input_register = State(np.dot(input_register, QFT_n.matrix))  # apply qft
     # Should return an integer number of the period of the function
     return input_register.random_measure_bs()
 
@@ -155,7 +155,7 @@ def main():
                 i += 1
                 n = 2 ** i
             global QFT_n
-            QFT_n = g_lib.QFT(i)  # Create a n x n QFT gate
+            QFT_n = g_lib.qft(i)  # Create a n x n qft gate
             found_period = False  # In case the step has to be repeated
             while not found_period:
                 y = shor_quantum(N, m, n, i)  # Find one of the peaking states

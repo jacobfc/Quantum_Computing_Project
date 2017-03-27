@@ -28,7 +28,7 @@ def main():
     # matrix to apply diffusion
     diff_gate = g_lib.diffusion_gate(qubit_count)
     # matrix to apply Hadamard to every qubit
-    gate_list = [g_lib.hadamard for i in range(qubit_count)]
+    gate_list = [g_lib.hadamard() for i in range(qubit_count)]
     H_n = quantum_circuit.MatrixGate.join_gates(qubit_count, gate_list)
 
     # create superposition by applying Hadamard to every qubit

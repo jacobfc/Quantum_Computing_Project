@@ -8,7 +8,7 @@ from tests.testcase import BaseTestCase
 
 class TestGate(BaseTestCase):
     def generic_controlled_u_example(self, gate_type):
-        gate = gate_type.controlled_gate(3, hadamard, [1], [0])
+        gate = gate_type.controlled_gate(3, hadamard(), [1], [0])
 
         # check if type is correct if we explicitly created
         # a functional / matrix gate
