@@ -15,10 +15,10 @@ class TestShor(BaseTestCase):
 
 def main():
     # arbitrary number of qubits
-    qubit_count = 4
+    qubit_count = 6
     basis_size = 1 << qubit_count
     # arbitrary key: 1000 - 1 gives the marked state
-    key = 0b0001
+    key = 0b000111
     # optimal number of iterations of Grover step
     n = math.floor(math.pi / (4 * math.asin(basis_size ** (-1 / 2))))
     # initial state
@@ -33,6 +33,9 @@ def main():
 
     # create superposition by applying Hadamard to every qubit
     state = H_n(state)
+    print(flip_gate)
+    print(diff_gate)
+    print(H_n)
     # perform Grover step required number of times
     full = flip_gate * diff_gate
     for i in range(n - 1):
