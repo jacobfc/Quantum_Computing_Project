@@ -185,8 +185,7 @@ class State(object):
             return 0
 
     @classmethod
-    def from_basis_state(cls, qubit_count: int, basis_state: int,
-                         dtype: type = np.complex128):
+    def from_basis_state(cls, qubit_count, basis_state, dtype=np.complex128):
         """ Creates a State object that is a basis state, given its label.
 
         :param qubit_count: Number of qubits in the state
