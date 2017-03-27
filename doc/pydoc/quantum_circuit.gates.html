@@ -46,7 +46,16 @@
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="FunctionalGate">class <strong>FunctionalGate</strong></a>(<a href="quantum_circuit.gates.html#Gate">Gate</a>)</font></td></tr>
     
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Concrete&nbsp;implementation&nbsp;of&nbsp;a&nbsp;gate.<br>
+&nbsp;<br>
+The&nbsp;implementation&nbsp;is&nbsp;based&nbsp;on&nbsp;storing&nbsp;function&nbsp;to&nbsp;map&nbsp;basis&nbsp;states&nbsp;to<br>
+full&nbsp;states&nbsp;these&nbsp;are&nbsp;transformed&nbsp;into&nbsp;by&nbsp;applying&nbsp;the&nbsp;gate&nbsp;to&nbsp;it.<br>
+&nbsp;<br>
+FunctionalGates&nbsp;are&nbsp;most&nbsp;easily&nbsp;constructed&nbsp;using&nbsp;the&nbsp;static&nbsp;methods<br>
+in&nbsp;the&nbsp;Gates&nbsp;class&nbsp;(can&nbsp;be&nbsp;called&nbsp;on&nbsp;<a href="#FunctionalGate">FunctionalGate</a>&nbsp;to&nbsp;explicitly&nbsp;specify<br>
+the&nbsp;gate&nbsp;class).<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="quantum_circuit.gates.html#FunctionalGate">FunctionalGate</a></dd>
 <dd><a href="quantum_circuit.gates.html#Gate">Gate</a></dd>
@@ -54,11 +63,21 @@
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="FunctionalGate-__call__"><strong>__call__</strong></a>(self, state)</dt><dd><tt>Calls&nbsp;a&nbsp;gate&nbsp;on&nbsp;state.&nbsp;Does<br>
+<dl><dt><a name="FunctionalGate-__call__"><strong>__call__</strong></a>(self, state)</dt><dd><tt>Calls&nbsp;a&nbsp;gate&nbsp;on&nbsp;state.<br>
+&nbsp;<br>
 :param&nbsp;state:&nbsp;State&nbsp;which&nbsp;the&nbsp;gate&nbsp;is&nbsp;acting&nbsp;on<br>
 :return:&nbsp;The&nbsp;result&nbsp;of&nbsp;the&nbsp;<a href="#Gate">Gate</a>&nbsp;acting&nbsp;on&nbsp;the&nbsp;State</tt></dd></dl>
 
-<dl><dt><a name="FunctionalGate-__init__"><strong>__init__</strong></a>(self, qubit_count, _eval_bs, dtype=<class 'numpy.complex128'>)</dt></dl>
+<dl><dt><a name="FunctionalGate-__init__"><strong>__init__</strong></a>(self, qubit_count, _eval_bs, _eval_state, dtype=<class 'numpy.complex128'>)</dt><dd><tt>Create&nbsp;a&nbsp;Functional&nbsp;gate&nbsp;from&nbsp;eval_bs&nbsp;function&nbsp;(see&nbsp;<a href="#Gate">Gate</a>.eval_bs).<br>
+&nbsp;<br>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;_eval_bs:&nbsp;function<br>
+:type&nbsp;_eval_state:&nbsp;function<br>
+:type&nbsp;dtype:&nbsp;type<br>
+:param&nbsp;qubit_count:&nbsp;Number&nbsp;of&nbsp;qubits.<br>
+:param&nbsp;_eval_bs:&nbsp;Function&nbsp;mapping&nbsp;basis&nbsp;state&nbsp;to&nbsp;output&nbsp;State<br>
+:param&nbsp;_eval_state:&nbsp;Function&nbsp;mapping&nbsp;full&nbsp;State&nbsp;to&nbsp;full&nbsp;output&nbsp;State<br>
+:param&nbsp;dtype:&nbsp;Data&nbsp;type&nbsp;for&nbsp;constructing&nbsp;states&nbsp;(amplitudes)</tt></dd></dl>
 
 <dl><dt><a name="FunctionalGate-__mul__"><strong>__mul__</strong></a>(self, gate2)</dt></dl>
 
@@ -66,10 +85,27 @@ Methods defined here:<br>
 
 <hr>
 Class methods defined here:<br>
-<dl><dt><a name="FunctionalGate-from_eval_bs"><strong>from_eval_bs</strong></a>(qubit_count, _eval_bs, dtype=None)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>:param&nbsp;qubit_count:<br>
-:param&nbsp;_eval_bs:<br>
-:param&nbsp;dtype:&nbsp;Data&nbsp;type&nbsp;used&nbsp;for&nbsp;amplitudes&nbsp;in&nbsp;states.<br>
-:return:</tt></dd></dl>
+<dl><dt><a name="FunctionalGate-from_eval_bs"><strong>from_eval_bs</strong></a>(qubit_count, _eval_bs, dtype=None)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>See&nbsp;<a href="#Gate">Gate</a>.from_eval_bs.<br>
+&nbsp;<br>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;_eval_bs:&nbsp;function<br>
+:type&nbsp;dtype:&nbsp;type<br>
+:param&nbsp;qubit_count:&nbsp;Number&nbsp;of&nbsp;qubits.<br>
+:param&nbsp;_eval_bs:&nbsp;Method&nbsp;specifying&nbsp;the&nbsp;gate's&nbsp;output&nbsp;state,&nbsp;given<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;basis&nbsp;state&nbsp;(int)&nbsp;as&nbsp;input.<br>
+:param&nbsp;dtype:&nbsp;Data&nbsp;type&nbsp;used&nbsp;in&nbsp;states&nbsp;and&nbsp;matrices&nbsp;(complex&nbsp;number).<br>
+:return:&nbsp;<a href="#Gate">Gate</a></tt></dd></dl>
+
+<dl><dt><a name="FunctionalGate-from_eval_state"><strong>from_eval_state</strong></a>(qubit_count, _eval_state, dtype=None)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Create&nbsp;a&nbsp;<a href="#FunctionalGate">FunctionalGate</a>&nbsp;given&nbsp;a&nbsp;function&nbsp;mapping&nbsp;between&nbsp;States.<br>
+&nbsp;<br>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;_eval_state:&nbsp;function<br>
+:type&nbsp;dtype:&nbsp;type<br>
+:param&nbsp;qubit_count:&nbsp;Number&nbsp;of&nbsp;qubits.<br>
+:param&nbsp;_eval_state:&nbsp;Function&nbsp;computing&nbsp;the&nbsp;output&nbsp;State&nbsp;of&nbsp;the&nbsp;gate,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;given&nbsp;an&nbsp;input&nbsp;State.<br>
+:param&nbsp;dtype:&nbsp;Complex&nbsp;number&nbsp;type&nbsp;used&nbsp;to&nbsp;create&nbsp;States.<br>
+:return:&nbsp;State</tt></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>
@@ -83,7 +119,7 @@ Data and other attributes defined here:<br>
 
 <hr>
 Class methods inherited from <a href="quantum_circuit.gates.html#Gate">Gate</a>:<br>
-<dl><dt><a name="FunctionalGate-controlled_gate"><strong>controlled_gate</strong></a>(qubit_count, gate, apply_qubits, control_qubits, dtype=<class 'numpy.complex128'>)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Create&nbsp;a&nbsp;controlled-U&nbsp;gate,&nbsp;given&nbsp;the&nbsp;gate&nbsp;and&nbsp;the&nbsp;used&nbsp;qubits.<br>
+<dl><dt><a name="FunctionalGate-controlled_gate"><strong>controlled_gate</strong></a>(qubit_count, gate, apply_qubits, control_qubits, dtype=<class 'numpy.complex128'>)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Create&nbsp;a&nbsp;controlled&nbsp;gate,&nbsp;given&nbsp;the&nbsp;gate&nbsp;and&nbsp;the&nbsp;used&nbsp;qubits.<br>
 &nbsp;<br>
 Example:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;qubit_count&nbsp;=&nbsp;3<br>
@@ -102,13 +138,14 @@ Example:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;|7&gt;&nbsp;=&nbsp;|111&gt;&nbsp;-&gt;&nbsp;|1&gt;(|0&gt;&nbsp;-&nbsp;|1&gt;)|1&gt;&nbsp;=&nbsp;|5&gt;&nbsp;-&nbsp;|7&gt;<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;so&nbsp;we&nbsp;can&nbsp;see&nbsp;the&nbsp;matrix&nbsp;representation&nbsp;of&nbsp;the&nbsp;whole&nbsp;gate&nbsp;would&nbsp;be<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2|<br>
 &nbsp;&nbsp;&nbsp;&nbsp;where&nbsp;s2&nbsp;=&nbsp;1/sqrt(2).<br>
 &nbsp;<br>
 Specification&nbsp;of&nbsp;the&nbsp;U&nbsp;matrix&nbsp;in&nbsp;relation&nbsp;with&nbsp;apply_qubits:<br>
@@ -126,6 +163,11 @@ Specification&nbsp;of&nbsp;the&nbsp;U&nbsp;matrix&nbsp;in&nbsp;relation&nbsp;wit
 &nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;2^0&nbsp;-&nbsp;valued,&nbsp;qubit&nbsp;1&nbsp;is&nbsp;2^1&nbsp;-&nbsp;valued.<br>
 &nbsp;<br>
 &nbsp;<br>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;gate:&nbsp;<a href="#Gate">Gate</a><br>
+:type&nbsp;apply_qubits:&nbsp;[int]<br>
+:type&nbsp;control_qubits:&nbsp;[int]<br>
+:type&nbsp;dtype:&nbsp;type<br>
 :param&nbsp;qubit_count:&nbsp;Dimensionality&nbsp;of&nbsp;the&nbsp;gate&nbsp;("number&nbsp;of&nbsp;wires").<br>
 :param&nbsp;gate:&nbsp;Unitary&nbsp;matrix.&nbsp;Assumed&nbsp;to&nbsp;be&nbsp;given&nbsp;in&nbsp;computational&nbsp;basis,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;using&nbsp;the&nbsp;order&nbsp;as&nbsp;in&nbsp;apply_qubits.<br>
@@ -137,10 +179,24 @@ Specification&nbsp;of&nbsp;the&nbsp;U&nbsp;matrix&nbsp;in&nbsp;relation&nbsp;wit
 
 <dl><dt><a name="FunctionalGate-multi_gate"><strong>multi_gate</strong></a>(qubit_count, gate, apply_qubits)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Apply&nbsp;gate&nbsp;to&nbsp;multiple&nbsp;qubits&nbsp;at&nbsp;once.<br>
 &nbsp;<br>
-:param&nbsp;qubit_count:<br>
-:param&nbsp;apply_qubits:<br>
-:param&nbsp;gate:<br>
-:return:</tt></dd></dl>
+Example:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Apply&nbsp;hadamard&nbsp;gate&nbsp;to&nbsp;the&nbsp;first&nbsp;two&nbsp;qubits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;import&nbsp;quantum_circuit.gates_library&nbsp;as&nbsp;g_lib<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;g&nbsp;=&nbsp;<a href="#Gate">Gate</a>.<a href="#FunctionalGate-multi_gate">multi_gate</a>(3,&nbsp;g_lib.hadamard(),&nbsp;[0,&nbsp;1])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;out1&nbsp;=&nbsp;g(State.from_basis_state(3,&nbsp;4))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;out2&nbsp;=&nbsp;g(State.from_basis_state(3,&nbsp;0))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print(out1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0.500&nbsp;|4&gt;&nbsp;+&nbsp;0.500&nbsp;|5&gt;&nbsp;+&nbsp;0.500&nbsp;|6&gt;&nbsp;+&nbsp;0.500&nbsp;|7&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print(out2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0.500&nbsp;|0&gt;&nbsp;+&nbsp;0.500&nbsp;|1&gt;&nbsp;+&nbsp;0.500&nbsp;|2&gt;&nbsp;+&nbsp;0.500&nbsp;|3&gt;<br>
+&nbsp;<br>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;gate:&nbsp;<a href="#Gate">Gate</a><br>
+:type&nbsp;apply_qubits:&nbsp;[int]<br>
+:param&nbsp;qubit_count:&nbsp;Number&nbsp;of&nbsp;qubits&nbsp;of&nbsp;the&nbsp;gate&nbsp;to&nbsp;be&nbsp;created.<br>
+:param&nbsp;gate:&nbsp;1&nbsp;-&nbsp;qubit&nbsp;gate,&nbsp;to&nbsp;be&nbsp;applied&nbsp;to&nbsp;multiple&nbsp;qubits&nbsp;at&nbsp;once.<br>
+:param&nbsp;apply_qubits:&nbsp;Labels&nbsp;of&nbsp;qubits&nbsp;to&nbsp;apply&nbsp;the&nbsp;gate&nbsp;to.<br>
+:return:&nbsp;<a href="#Gate">Gate</a></tt></dd></dl>
 
 <hr>
 Data descriptors inherited from <a href="quantum_circuit.gates.html#Gate">Gate</a>:<br>
@@ -153,7 +209,7 @@ Data descriptors inherited from <a href="quantum_circuit.gates.html#Gate">Gate</
 <dl><dt><strong>dtype</strong></dt>
 <dd><tt>Specifies&nbsp;the&nbsp;data&nbsp;type&nbsp;used&nbsp;in&nbsp;constructing&nbsp;states&nbsp;and&nbsp;matrices.<br>
 &nbsp;<br>
-The&nbsp;property&nbsp;*Gate._dtype&nbsp;must&nbsp;be&nbsp;set&nbsp;by&nbsp;child&nbsp;classes.</tt></dd>
+The&nbsp;property&nbsp;(attribute)&nbsp;*Gate._dtype&nbsp;must&nbsp;be&nbsp;set&nbsp;by&nbsp;child&nbsp;classes.</tt></dd>
 </dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -163,26 +219,44 @@ The&nbsp;property&nbsp;*Gate._dtype&nbsp;must&nbsp;be&nbsp;set&nbsp;by&nbsp;chil
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
-<dl><dt><a name="Gate-__call__"><strong>__call__</strong></a>(self, state)</dt><dd><tt>Call&nbsp;a&nbsp;gate&nbsp;to&nbsp;act&nbsp;on&nbsp;a&nbsp;state<br>
-:param&nbsp;state:&nbsp;The&nbsp;state&nbsp;for&nbsp;the&nbsp;gate&nbsp;to&nbsp;act&nbsp;on<br>
-:return:&nbsp;The&nbsp;state&nbsp;resulting&nbsp;from&nbsp;the&nbsp;gate&nbsp;acting&nbsp;on&nbsp;the&nbsp;input&nbsp;state</tt></dd></dl>
-
-<dl><dt><a name="Gate-__mul__"><strong>__mul__</strong></a>(self, gate2)</dt><dd><tt>g1&nbsp;*&nbsp;g2&nbsp;is&nbsp;equivalent&nbsp;of&nbsp;saying&nbsp;first&nbsp;apply&nbsp;g2&nbsp;then&nbsp;g1<br>
+<dl><dt><a name="Gate-__call__"><strong>__call__</strong></a>(self, state)</dt><dd><tt>Call&nbsp;a&nbsp;gate&nbsp;to&nbsp;act&nbsp;on&nbsp;a&nbsp;state.<br>
 &nbsp;<br>
-:param&nbsp;gate2:&nbsp;A&nbsp;gate.<br>
+Example&nbsp;using&nbsp;gates&nbsp;library:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;from&nbsp;quantum_circuit.gates_library&nbsp;import&nbsp;identity<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;gate_id&nbsp;=&nbsp;identity()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print(gate_id(State([0,&nbsp;1])))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;1.000&nbsp;|1&gt;<br>
+&nbsp;<br>
+:type&nbsp;state:&nbsp;State<br>
+:param&nbsp;state:&nbsp;The&nbsp;State&nbsp;for&nbsp;the&nbsp;gate&nbsp;to&nbsp;act&nbsp;on.<br>
+:return:&nbsp;The&nbsp;State&nbsp;obtained&nbsp;by&nbsp;applying&nbsp;the&nbsp;gate's&nbsp;operation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;on&nbsp;the&nbsp;input&nbsp;state.</tt></dd></dl>
+
+<dl><dt><a name="Gate-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>Initialize&nbsp;a&nbsp;gate&nbsp;matrix.<br>
+&nbsp;<br>
+Extending&nbsp;classes&nbsp;may&nbsp;freely&nbsp;use&nbsp;a&nbsp;different&nbsp;signature&nbsp;for&nbsp;this&nbsp;method.<br>
+&nbsp;<br>
+self.<strong>_dtype</strong>&nbsp;must&nbsp;be&nbsp;set&nbsp;to&nbsp;a&nbsp;complex&nbsp;number&nbsp;type,&nbsp;that&nbsp;is&nbsp;used&nbsp;in<br>
+creating&nbsp;and&nbsp;computing&nbsp;output&nbsp;states&nbsp;(for&nbsp;the&nbsp;amplitudes).</tt></dd></dl>
+
+<dl><dt><a name="Gate-__mul__"><strong>__mul__</strong></a>(self, gate2)</dt><dd><tt>g1&nbsp;*&nbsp;g2&nbsp;returns&nbsp;a&nbsp;gate&nbsp;that&nbsp;first&nbsp;applies&nbsp;g2,&nbsp;then&nbsp;g1.<br>
+&nbsp;<br>
+:type&nbsp;gate2:&nbsp;<a href="#Gate">Gate</a><br>
+:param&nbsp;gate2:&nbsp;A&nbsp;gate&nbsp;of&nbsp;same&nbsp;size&nbsp;as&nbsp;self.<br>
 :return:&nbsp;A&nbsp;gate&nbsp;equivalent&nbsp;to&nbsp;the&nbsp;operation&nbsp;g1(g2(state)).<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;gate&nbsp;is&nbsp;a&nbsp;matrix&nbsp;gate&nbsp;if&nbsp;gate2&nbsp;is&nbsp;a&nbsp;matrix&nbsp;gate,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;otherwise&nbsp;a&nbsp;functional&nbsp;gate&nbsp;is&nbsp;returned</tt></dd></dl>
 
 <dl><dt><a name="Gate-eval_bs"><strong>eval_bs</strong></a>(self, basis_state)</dt><dd><tt>Apply&nbsp;gate&nbsp;to&nbsp;basis&nbsp;state&nbsp;as&nbsp;input.<br>
 &nbsp;<br>
-:param&nbsp;basis_state:&nbsp;Integer&nbsp;representing&nbsp;a&nbsp;basis&nbsp;state&nbsp;in&nbsp;computational<br>
-&nbsp;&nbsp;&nbsp;&nbsp;basis.<br>
+:type&nbsp;basis_state:&nbsp;int<br>
+:param&nbsp;basis_state:&nbsp;Integer&nbsp;in&nbsp;[0,&nbsp;2**qubit_count)&nbsp;representing<br>
+&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;basis&nbsp;state&nbsp;in&nbsp;the&nbsp;computational&nbsp;basis.<br>
 :return:&nbsp;State</tt></dd></dl>
 
 <hr>
 Class methods defined here:<br>
-<dl><dt><a name="Gate-controlled_gate"><strong>controlled_gate</strong></a>(qubit_count, gate, apply_qubits, control_qubits, dtype=<class 'numpy.complex128'>)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Create&nbsp;a&nbsp;controlled-U&nbsp;gate,&nbsp;given&nbsp;the&nbsp;gate&nbsp;and&nbsp;the&nbsp;used&nbsp;qubits.<br>
+<dl><dt><a name="Gate-controlled_gate"><strong>controlled_gate</strong></a>(qubit_count, gate, apply_qubits, control_qubits, dtype=<class 'numpy.complex128'>)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Create&nbsp;a&nbsp;controlled&nbsp;gate,&nbsp;given&nbsp;the&nbsp;gate&nbsp;and&nbsp;the&nbsp;used&nbsp;qubits.<br>
 &nbsp;<br>
 Example:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;qubit_count&nbsp;=&nbsp;3<br>
@@ -201,13 +275,14 @@ Example:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;|7&gt;&nbsp;=&nbsp;|111&gt;&nbsp;-&gt;&nbsp;|1&gt;(|0&gt;&nbsp;-&nbsp;|1&gt;)|1&gt;&nbsp;=&nbsp;|5&gt;&nbsp;-&nbsp;|7&gt;<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;so&nbsp;we&nbsp;can&nbsp;see&nbsp;the&nbsp;matrix&nbsp;representation&nbsp;of&nbsp;the&nbsp;whole&nbsp;gate&nbsp;would&nbsp;be<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2|<br>
 &nbsp;&nbsp;&nbsp;&nbsp;where&nbsp;s2&nbsp;=&nbsp;1/sqrt(2).<br>
 &nbsp;<br>
 Specification&nbsp;of&nbsp;the&nbsp;U&nbsp;matrix&nbsp;in&nbsp;relation&nbsp;with&nbsp;apply_qubits:<br>
@@ -225,6 +300,11 @@ Specification&nbsp;of&nbsp;the&nbsp;U&nbsp;matrix&nbsp;in&nbsp;relation&nbsp;wit
 &nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;2^0&nbsp;-&nbsp;valued,&nbsp;qubit&nbsp;1&nbsp;is&nbsp;2^1&nbsp;-&nbsp;valued.<br>
 &nbsp;<br>
 &nbsp;<br>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;gate:&nbsp;<a href="#Gate">Gate</a><br>
+:type&nbsp;apply_qubits:&nbsp;[int]<br>
+:type&nbsp;control_qubits:&nbsp;[int]<br>
+:type&nbsp;dtype:&nbsp;type<br>
 :param&nbsp;qubit_count:&nbsp;Dimensionality&nbsp;of&nbsp;the&nbsp;gate&nbsp;("number&nbsp;of&nbsp;wires").<br>
 :param&nbsp;gate:&nbsp;Unitary&nbsp;matrix.&nbsp;Assumed&nbsp;to&nbsp;be&nbsp;given&nbsp;in&nbsp;computational&nbsp;basis,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;using&nbsp;the&nbsp;order&nbsp;as&nbsp;in&nbsp;apply_qubits.<br>
@@ -238,17 +318,35 @@ Specification&nbsp;of&nbsp;the&nbsp;U&nbsp;matrix&nbsp;in&nbsp;relation&nbsp;wit
 &nbsp;<br>
 Must&nbsp;be&nbsp;overridden&nbsp;in&nbsp;classes&nbsp;that&nbsp;inherit&nbsp;from&nbsp;<a href="#Gate">Gate</a><br>
 &nbsp;<br>
-:param&nbsp;qubit_count:<br>
-:param&nbsp;_eval_bs:<br>
-:param&nbsp;dtype:&nbsp;Data&nbsp;type&nbsp;used&nbsp;in&nbsp;states&nbsp;and&nbsp;matrices.<br>
-:return:</tt></dd></dl>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;_eval_bs:&nbsp;function<br>
+:type&nbsp;dtype:&nbsp;type<br>
+:param&nbsp;qubit_count:&nbsp;Number&nbsp;of&nbsp;qubits.<br>
+:param&nbsp;_eval_bs:&nbsp;Method&nbsp;specifying&nbsp;the&nbsp;gate's&nbsp;output&nbsp;state,&nbsp;given<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;basis&nbsp;state&nbsp;(int)&nbsp;as&nbsp;input.<br>
+:param&nbsp;dtype:&nbsp;Data&nbsp;type&nbsp;used&nbsp;in&nbsp;states&nbsp;and&nbsp;matrices&nbsp;(complex&nbsp;number).<br>
+:return:&nbsp;<a href="#Gate">Gate</a></tt></dd></dl>
 
 <dl><dt><a name="Gate-multi_gate"><strong>multi_gate</strong></a>(qubit_count, gate, apply_qubits)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Apply&nbsp;gate&nbsp;to&nbsp;multiple&nbsp;qubits&nbsp;at&nbsp;once.<br>
 &nbsp;<br>
-:param&nbsp;qubit_count:<br>
-:param&nbsp;apply_qubits:<br>
-:param&nbsp;gate:<br>
-:return:</tt></dd></dl>
+Example:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Apply&nbsp;hadamard&nbsp;gate&nbsp;to&nbsp;the&nbsp;first&nbsp;two&nbsp;qubits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;import&nbsp;quantum_circuit.gates_library&nbsp;as&nbsp;g_lib<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;g&nbsp;=&nbsp;<a href="#Gate">Gate</a>.<a href="#Gate-multi_gate">multi_gate</a>(3,&nbsp;g_lib.hadamard(),&nbsp;[0,&nbsp;1])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;out1&nbsp;=&nbsp;g(State.from_basis_state(3,&nbsp;4))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;out2&nbsp;=&nbsp;g(State.from_basis_state(3,&nbsp;0))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print(out1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0.500&nbsp;|4&gt;&nbsp;+&nbsp;0.500&nbsp;|5&gt;&nbsp;+&nbsp;0.500&nbsp;|6&gt;&nbsp;+&nbsp;0.500&nbsp;|7&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print(out2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0.500&nbsp;|0&gt;&nbsp;+&nbsp;0.500&nbsp;|1&gt;&nbsp;+&nbsp;0.500&nbsp;|2&gt;&nbsp;+&nbsp;0.500&nbsp;|3&gt;<br>
+&nbsp;<br>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;gate:&nbsp;<a href="#Gate">Gate</a><br>
+:type&nbsp;apply_qubits:&nbsp;[int]<br>
+:param&nbsp;qubit_count:&nbsp;Number&nbsp;of&nbsp;qubits&nbsp;of&nbsp;the&nbsp;gate&nbsp;to&nbsp;be&nbsp;created.<br>
+:param&nbsp;gate:&nbsp;1&nbsp;-&nbsp;qubit&nbsp;gate,&nbsp;to&nbsp;be&nbsp;applied&nbsp;to&nbsp;multiple&nbsp;qubits&nbsp;at&nbsp;once.<br>
+:param&nbsp;apply_qubits:&nbsp;Labels&nbsp;of&nbsp;qubits&nbsp;to&nbsp;apply&nbsp;the&nbsp;gate&nbsp;to.<br>
+:return:&nbsp;<a href="#Gate">Gate</a></tt></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>
@@ -259,13 +357,15 @@ Data descriptors defined here:<br>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <dl><dt><strong>basis_size</strong></dt>
+<dd><tt>Number&nbsp;of&nbsp;basis&nbsp;states,&nbsp;same&nbsp;as&nbsp;2&nbsp;^&nbsp;qubit_count.</tt></dd>
 </dl>
 <dl><dt><strong>dtype</strong></dt>
 <dd><tt>Specifies&nbsp;the&nbsp;data&nbsp;type&nbsp;used&nbsp;in&nbsp;constructing&nbsp;states&nbsp;and&nbsp;matrices.<br>
 &nbsp;<br>
-The&nbsp;property&nbsp;*Gate._dtype&nbsp;must&nbsp;be&nbsp;set&nbsp;by&nbsp;child&nbsp;classes.</tt></dd>
+The&nbsp;property&nbsp;(attribute)&nbsp;*Gate._dtype&nbsp;must&nbsp;be&nbsp;set&nbsp;by&nbsp;child&nbsp;classes.</tt></dd>
 </dl>
 <dl><dt><strong>qubit_count</strong></dt>
+<dd><tt>Number&nbsp;of&nbsp;qubits&nbsp;(in&nbsp;classical&nbsp;analogy:&nbsp;wires).</tt></dd>
 </dl>
 <hr>
 Data and other attributes defined here:<br>
@@ -285,7 +385,10 @@ Data and other attributes defined here:<br>
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="MatrixGate-__call__"><strong>__call__</strong></a>(self, state)</dt></dl>
+<dl><dt><a name="MatrixGate-__call__"><strong>__call__</strong></a>(self, state)</dt><dd><tt>Allows&nbsp;a&nbsp;<a href="#Gate">Gate</a>&nbsp;to&nbsp;be&nbsp;called&nbsp;on&nbsp;a&nbsp;State&nbsp;<a href="builtins.html#object">object</a><br>
+&nbsp;<br>
+:param&nbsp;state:&nbsp;the&nbsp;State&nbsp;<a href="builtins.html#object">object</a>&nbsp;the&nbsp;gate&nbsp;is&nbsp;being&nbsp;called&nbsp;on<br>
+:return:&nbsp;the&nbsp;State&nbsp;<a href="builtins.html#object">object</a>&nbsp;resulting&nbsp;from&nbsp;the&nbsp;operation&nbsp;of&nbsp;the&nbsp;gate</tt></dd></dl>
 
 <dl><dt><a name="MatrixGate-__init__"><strong>__init__</strong></a>(self, qubit_count, matrix, dtype=<class 'numpy.complex128'>)</dt></dl>
 
@@ -301,6 +404,12 @@ Methods defined here:<br>
 Class methods defined here:<br>
 <dl><dt><a name="MatrixGate-from_eval_bs"><strong>from_eval_bs</strong></a>(qubit_count, _eval_bs, dtype=<class 'numpy.complex128'>)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt></dl>
 
+<dl><dt><a name="MatrixGate-join_gates"><strong>join_gates</strong></a>(qubit_count, gate_list)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Method&nbsp;to&nbsp;merge&nbsp;matrix&nbsp;gates&nbsp;(using&nbsp;tensor&nbsp;product)&nbsp;into&nbsp;larger&nbsp;one<br>
+&nbsp;<br>
+:param&nbsp;qubit_count:&nbsp;number&nbsp;of&nbsp;qubits<br>
+:param&nbsp;gate_list:&nbsp;list&nbsp;of&nbsp;applied&nbsp;gates<br>
+:return:&nbsp;joint&nbsp;gate</tt></dd></dl>
+
 <hr>
 Data descriptors defined here:<br>
 <dl><dt><strong>basis_size</strong></dt>
@@ -313,7 +422,7 @@ Data and other attributes defined here:<br>
 
 <hr>
 Class methods inherited from <a href="quantum_circuit.gates.html#Gate">Gate</a>:<br>
-<dl><dt><a name="MatrixGate-controlled_gate"><strong>controlled_gate</strong></a>(qubit_count, gate, apply_qubits, control_qubits, dtype=<class 'numpy.complex128'>)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Create&nbsp;a&nbsp;controlled-U&nbsp;gate,&nbsp;given&nbsp;the&nbsp;gate&nbsp;and&nbsp;the&nbsp;used&nbsp;qubits.<br>
+<dl><dt><a name="MatrixGate-controlled_gate"><strong>controlled_gate</strong></a>(qubit_count, gate, apply_qubits, control_qubits, dtype=<class 'numpy.complex128'>)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Create&nbsp;a&nbsp;controlled&nbsp;gate,&nbsp;given&nbsp;the&nbsp;gate&nbsp;and&nbsp;the&nbsp;used&nbsp;qubits.<br>
 &nbsp;<br>
 Example:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;qubit_count&nbsp;=&nbsp;3<br>
@@ -332,13 +441,14 @@ Example:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;|7&gt;&nbsp;=&nbsp;|111&gt;&nbsp;-&gt;&nbsp;|1&gt;(|0&gt;&nbsp;-&nbsp;|1&gt;)|1&gt;&nbsp;=&nbsp;|5&gt;&nbsp;-&nbsp;|7&gt;<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;so&nbsp;we&nbsp;can&nbsp;see&nbsp;the&nbsp;matrix&nbsp;representation&nbsp;of&nbsp;the&nbsp;whole&nbsp;gate&nbsp;would&nbsp;be<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;|<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;s2&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;-s2|<br>
 &nbsp;&nbsp;&nbsp;&nbsp;where&nbsp;s2&nbsp;=&nbsp;1/sqrt(2).<br>
 &nbsp;<br>
 Specification&nbsp;of&nbsp;the&nbsp;U&nbsp;matrix&nbsp;in&nbsp;relation&nbsp;with&nbsp;apply_qubits:<br>
@@ -356,6 +466,11 @@ Specification&nbsp;of&nbsp;the&nbsp;U&nbsp;matrix&nbsp;in&nbsp;relation&nbsp;wit
 &nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;2^0&nbsp;-&nbsp;valued,&nbsp;qubit&nbsp;1&nbsp;is&nbsp;2^1&nbsp;-&nbsp;valued.<br>
 &nbsp;<br>
 &nbsp;<br>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;gate:&nbsp;<a href="#Gate">Gate</a><br>
+:type&nbsp;apply_qubits:&nbsp;[int]<br>
+:type&nbsp;control_qubits:&nbsp;[int]<br>
+:type&nbsp;dtype:&nbsp;type<br>
 :param&nbsp;qubit_count:&nbsp;Dimensionality&nbsp;of&nbsp;the&nbsp;gate&nbsp;("number&nbsp;of&nbsp;wires").<br>
 :param&nbsp;gate:&nbsp;Unitary&nbsp;matrix.&nbsp;Assumed&nbsp;to&nbsp;be&nbsp;given&nbsp;in&nbsp;computational&nbsp;basis,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;using&nbsp;the&nbsp;order&nbsp;as&nbsp;in&nbsp;apply_qubits.<br>
@@ -367,10 +482,24 @@ Specification&nbsp;of&nbsp;the&nbsp;U&nbsp;matrix&nbsp;in&nbsp;relation&nbsp;wit
 
 <dl><dt><a name="MatrixGate-multi_gate"><strong>multi_gate</strong></a>(qubit_count, gate, apply_qubits)<font color="#909090"><font face="helvetica, arial"> from <a href="abc.html#ABCMeta">abc.ABCMeta</a></font></font></dt><dd><tt>Apply&nbsp;gate&nbsp;to&nbsp;multiple&nbsp;qubits&nbsp;at&nbsp;once.<br>
 &nbsp;<br>
-:param&nbsp;qubit_count:<br>
-:param&nbsp;apply_qubits:<br>
-:param&nbsp;gate:<br>
-:return:</tt></dd></dl>
+Example:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Apply&nbsp;hadamard&nbsp;gate&nbsp;to&nbsp;the&nbsp;first&nbsp;two&nbsp;qubits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;import&nbsp;quantum_circuit.gates_library&nbsp;as&nbsp;g_lib<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;g&nbsp;=&nbsp;<a href="#Gate">Gate</a>.<a href="#MatrixGate-multi_gate">multi_gate</a>(3,&nbsp;g_lib.hadamard(),&nbsp;[0,&nbsp;1])<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;out1&nbsp;=&nbsp;g(State.from_basis_state(3,&nbsp;4))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;out2&nbsp;=&nbsp;g(State.from_basis_state(3,&nbsp;0))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print(out1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0.500&nbsp;|4&gt;&nbsp;+&nbsp;0.500&nbsp;|5&gt;&nbsp;+&nbsp;0.500&nbsp;|6&gt;&nbsp;+&nbsp;0.500&nbsp;|7&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&gt;&gt;&gt;&nbsp;print(out2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0.500&nbsp;|0&gt;&nbsp;+&nbsp;0.500&nbsp;|1&gt;&nbsp;+&nbsp;0.500&nbsp;|2&gt;&nbsp;+&nbsp;0.500&nbsp;|3&gt;<br>
+&nbsp;<br>
+:type&nbsp;qubit_count:&nbsp;int<br>
+:type&nbsp;gate:&nbsp;<a href="#Gate">Gate</a><br>
+:type&nbsp;apply_qubits:&nbsp;[int]<br>
+:param&nbsp;qubit_count:&nbsp;Number&nbsp;of&nbsp;qubits&nbsp;of&nbsp;the&nbsp;gate&nbsp;to&nbsp;be&nbsp;created.<br>
+:param&nbsp;gate:&nbsp;1&nbsp;-&nbsp;qubit&nbsp;gate,&nbsp;to&nbsp;be&nbsp;applied&nbsp;to&nbsp;multiple&nbsp;qubits&nbsp;at&nbsp;once.<br>
+:param&nbsp;apply_qubits:&nbsp;Labels&nbsp;of&nbsp;qubits&nbsp;to&nbsp;apply&nbsp;the&nbsp;gate&nbsp;to.<br>
+:return:&nbsp;<a href="#Gate">Gate</a></tt></dd></dl>
 
 <hr>
 Data descriptors inherited from <a href="quantum_circuit.gates.html#Gate">Gate</a>:<br>
@@ -383,7 +512,7 @@ Data descriptors inherited from <a href="quantum_circuit.gates.html#Gate">Gate</
 <dl><dt><strong>dtype</strong></dt>
 <dd><tt>Specifies&nbsp;the&nbsp;data&nbsp;type&nbsp;used&nbsp;in&nbsp;constructing&nbsp;states&nbsp;and&nbsp;matrices.<br>
 &nbsp;<br>
-The&nbsp;property&nbsp;*Gate._dtype&nbsp;must&nbsp;be&nbsp;set&nbsp;by&nbsp;child&nbsp;classes.</tt></dd>
+The&nbsp;property&nbsp;(attribute)&nbsp;*Gate._dtype&nbsp;must&nbsp;be&nbsp;set&nbsp;by&nbsp;child&nbsp;classes.</tt></dd>
 </dl>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
