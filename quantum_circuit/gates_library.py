@@ -128,7 +128,7 @@ def hadamard():
 def phase():
     """
     Phase gate for 1 qubit
-    Matrix repersentation is:
+    Matrix representation is:
     |1 0|
     |0 i|
     """
