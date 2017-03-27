@@ -41,8 +41,8 @@ class Gate(metaclass=abc.ABCMeta):
         """ Apply gate to basis state as input.
 
         :type basis_state: int
-        :param basis_state: Integer representing a basis state in computational
-            basis.
+        :param basis_state: Integer in [0, 2**qubit_count) representing
+            the basis state in the computational basis.
         :return: State
         """
         raise NotImplementedError()
@@ -50,6 +50,12 @@ class Gate(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def __call__(self, state):
         """ Call a gate to act on a state.
+
+        Example using gates library:
+            >>> from quantum_circuit.gates_library import identity
+            >>> gate_id = identity()
+            >>> print(gate_id(State([0, 1])))
+            1.000 |1>
 
         :type state: State
         :param state: The State for the gate to act on.
@@ -62,7 +68,8 @@ class Gate(metaclass=abc.ABCMeta):
     def __mul__(self, gate2):
         """ g1 * g2 returns a gate that first applies g2, then g1.
 
-        :param gate2: A gate.
+        :type gate2: Gate
+        :param gate2: A gate of same size as self.
         :return: A gate equivalent to the operation g1(g2(state)).
             The gate is a matrix gate if gate2 is a matrix gate,
             otherwise a functional gate is returned
@@ -75,10 +82,14 @@ class Gate(metaclass=abc.ABCMeta):
 
         Must be overridden in classes that inherit from Gate
 
-        :param qubit_count:
-        :param _eval_bs:
-        :param dtype: Data type used in states and matrices.
-        :return:
+        :type qubit_count: int
+        :type _eval_bs: function
+        :type dtype: type
+        :param qubit_count: Number of qubits.
+        :param _eval_bs: Method specifying the gate's output state, given
+            a basis state (int) as input.
+        :param dtype: Data type used in states and matrices (complex number).
+        :return: Gate
         """
         # by default use functional gate here (least overhead)
         return FunctionalGate.from_eval_bs(qubit_count, _eval_bs, dtype=dtype)
@@ -87,10 +98,24 @@ class Gate(metaclass=abc.ABCMeta):
     def multi_gate(cls, qubit_count, gate, apply_qubits):
         """ Apply gate to multiple qubits at once.
 
-        :param qubit_count:
-        :param apply_qubits:
-        :param gate:
-        :return:
+        Example:
+            Apply hadamard gate to the first two qubits
+            >>> import quantum_circuit.gates_library as g_lib
+            >>> g = Gate.multi_gate(3, g_lib.hadamard(), [0, 1])
+            >>> out1 = g(State.from_basis_state(3, 4))
+            >>> out2 = g(State.from_basis_state(3, 0))
+            >>> print(out1)
+            0.500 |4> + 0.500 |5> + 0.500 |6> + 0.500 |7>
+            >>> print(out2)
+            0.500 |0> + 0.500 |1> + 0.500 |2> + 0.500 |3>
+
+        :type qubit_count: int
+        :type gate: Gate
+        :type apply_qubits: [int]
+        :param qubit_count: Number of qubits of the gate to be created.
+        :param gate: 1 - qubit gate, to be applied to multiple qubits at once.
+        :param apply_qubits: Labels of qubits to apply the gate to.
+        :return: Gate
         """
         def _eval_bs(basis_state):
             out_states = [gate.eval_bs(_extract_sub_bs(basis_state, [qi]))
@@ -104,14 +129,14 @@ class Gate(metaclass=abc.ABCMeta):
                          for k in range(1 << len(apply_qubits))]
 
             return _insert_sub_bit_superpos(
-                1 << qubit_count, basis_state, out_state, apply_qubits)
+                1 << qubit_count, basis_state, State(out_state), apply_qubits)
 
         return cls.from_eval_bs(qubit_count, _eval_bs)
 
     @classmethod
     def controlled_gate(cls, qubit_count, gate, apply_qubits, control_qubits,
                         dtype=np.complex128):
-        """ Create a controlled-U gate, given the gate and the used qubits.
+        """ Create a controlled gate, given the gate and the used qubits.
 
         Example:
             qubit_count = 3
@@ -155,6 +180,11 @@ class Gate(metaclass=abc.ABCMeta):
             as 2^0 - valued, qubit 1 is 2^1 - valued.
 
 
+        :type qubit_count: int
+        :type gate: Gate
+        :type apply_qubits: [int]
+        :type control_qubits: [int]
+        :type dtype: type
         :param qubit_count: Dimensionality of the gate ("number of wires").
         :param gate: Unitary matrix. Assumed to be given in computational basis,
             using the order as in apply_qubits.
@@ -178,13 +208,6 @@ class Gate(metaclass=abc.ABCMeta):
         control_mask = sum(1 << i for i in control_qubits)
 
         def _eval_bs(basis_state):
-            """ Apply the gate to one basis state.
-
-            :param basis_state: Integer in [0, 2**qubit_count) representing
-                the basis state in the computational basis.
-            :return: An array representing the (possibly superposed)
-                state obtained by applying the gate.
-            """
             # if not all control qubits 1 => identity
             if basis_state & control_mask != control_mask:
                 return State.from_basis_state(qubit_count, basis_state)
@@ -205,18 +228,40 @@ class Gate(metaclass=abc.ABCMeta):
 
 
 class FunctionalGate(Gate):
+    """ Concrete implementation of a gate.
+
+    The implementation is based on storing function to map basis states to
+    full states these are transformed into by applying the gate to it.
+
+    FunctionalGates are most easily constructed using the static methods
+    in the Gates class (can be called on FunctionalGate to explicitly specify
+    the gate class).
+    """
     @classmethod
     def from_eval_bs(cls, qubit_count, _eval_bs, dtype=None):
-        """
+        """ See Gate.from_eval_bs.
 
-        :param qubit_count:
-        :param _eval_bs:
-        :param dtype: Data type used for amplitudes in states.
-        :return:
+        :type qubit_count: int
+        :type _eval_bs: function
+        :type dtype: type
+        :param qubit_count: Number of qubits.
+        :param _eval_bs: Method specifying the gate's output state, given
+            a basis state (int) as input.
+        :param dtype: Data type used in states and matrices (complex number).
+        :return: Gate
         """
         return cls(qubit_count, _eval_bs, dtype=dtype)
 
     def __init__(self, qubit_count, _eval_bs, dtype=np.complex128):
+        """ Create a Functional gate from eval_bs function (see Gate.eval_bs).
+
+        :type qubit_count: int
+        :type _eval_bs: function
+        :type dtype: type
+        :param qubit_count: Number of qubits.
+        :param _eval_bs: Function mapping basis state to output State
+        :param dtype: Data type for constructing states (amplitudes)
+        """
         self._dtype = dtype
         self._basis_size = 1 << qubit_count
         self._qubit_count = qubit_count
@@ -234,8 +279,8 @@ class FunctionalGate(Gate):
         return self._basis_size
 
     def __call__(self, state):
-        """
-        Calls a gate on state. Does
+        """ Calls a gate on state.
+        
         :param state: State which the gate is acting on
         :return: The result of the Gate acting on the State
         """
@@ -259,7 +304,7 @@ class MatrixGate(Gate):
 
     @classmethod
     def join_gates(cls, qubit_count, gate_list):
-        """ Method to merge matrix gates (using tensor product) into a larger one
+        """ Method to merge matrix gates (using tensor product) into larger one
 
         :param qubit_count: number of qubits
         :param gate_list: list of applied gates
