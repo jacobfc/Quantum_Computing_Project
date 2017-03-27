@@ -191,22 +191,39 @@ class State(object):
     def __setitem__(self, key, value):
         return self.amplitudes.__setitem__(key, value)
 
-    def __eq__(self, other):
-        return np.array_equal(self, other)
+    def __eq__(self, state):
+        return np.array_equal(self, state)
 
     def __repr__(self):
         return self.amplitudes.__repr__()
 
-    def __add__(self, other):
-        return State(self.amplitudes + other.amplitudes)
+    def __add__(self, state):
+        return State(self + state)
 
     def __radd__(self, other):
-        if other == 0:  # supporting sum
-            return State(self.amplitudes)
-        return State(self.amplitudes + other.amplitudes)
+        """ Support addition to zero (as neutral element).
 
-    def __sub__(self, other):
-        return State(self.amplitudes - other.amplitudes)
+        Do not explicitly call this.
+
+        This method is needed to support the builtin sum method.
+        Adding a state to 0 will yield the state:
+        >>> s = State([0, 1])
+        >>> (0 + s) == s
+        True
+
+        Executing 'state + state' will always lead to __add__ being called.
+        Generally 'number + state' or 'state + number' is not supported,
+        as the meaning of these statements is ambiguous.
+
+        :param other: 0.
+        :return: State(self).
+        """
+        if other == 0:
+            return State(self)  # return a copy
+        return self + other  # code execution should never come to this point
+
+    def __sub__(self, state):
+        return State(self.amplitudes - state.amplitudes)
 
     def __neg__(self):
         return State(-self.amplitudes)
@@ -223,8 +240,8 @@ class State(object):
             return np.conj(self).dot(other)
         return State(self.amplitudes.__mul__(other))
 
-    def __rmul__(self, other):
-        return State(self.amplitudes.__rmul__(other))
+    def __rmul__(self, number):
+        return State(self.amplitudes.__rmul__(number))
 
     def __truediv__(self, number):
         return State(self.amplitudes / number)
@@ -238,7 +255,7 @@ class State(object):
         def sign(num):
             return '+' if num > 0 else '-'
 
-        for amp, label in zip(self.amplitudes, range(self.basis_size)):
+        for amp, label in zip(self, range(self.basis_size)):
             if amp == 0:
                 continue
 
