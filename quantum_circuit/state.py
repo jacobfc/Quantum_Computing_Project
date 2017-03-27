@@ -158,7 +158,6 @@ class State(object):
 
         :return: The basis state which the state was measured to be in
         """
-
         sample = np.random.random_sample()  # random number in [0, 1)
         bs = 0  # start "checking" if it's in the 0th basis state
         acc = self.prob_of_bs(bs)
@@ -167,6 +166,23 @@ class State(object):
             bs += 1
             acc += self.prob_of_bs(bs)
         return bs
+
+    def random_measure_qubit(self, qubit):
+        """ Randomly get state of one qubit according to state's probabilities.
+
+        :type qubit: int
+        :param qubit: Index of qubit to measure.
+        :return: Either 0 or 1.
+        """
+        # sum of probabilities of basis states, for which qubit is set
+        prob_set = sum(self.prob_of_bs(bs)
+                       for bs in range(self.basis_size)
+                       if (1 << qubit) & bs != 0)  # if (qu-)bit is set
+
+        if np.random.random_sample() < prob_set:
+            return 1
+        else:
+            return 0
 
     @classmethod
     def from_basis_state(cls, qubit_count: int, basis_state: int,
