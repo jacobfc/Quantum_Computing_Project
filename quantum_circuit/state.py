@@ -198,7 +198,7 @@ class State(object):
         return self.amplitudes.__repr__()
 
     def __add__(self, state):
-        return State(self + state)
+        return State(self.amplitudes + state)
 
     def __radd__(self, other):
         """ Support addition to zero (as neutral element).
