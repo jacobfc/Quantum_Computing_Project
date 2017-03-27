@@ -243,7 +243,7 @@ class State(object):
         :return: State(self).
         """
         if other == 0:
-            return State(self)  # return a copy
+            return State(self.amplitudes)  # return a copy
         return self + other  # code execution should never come to this point
 
     def __sub__(self, state):
