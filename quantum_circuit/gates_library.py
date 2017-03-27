@@ -1,8 +1,8 @@
 # from quantum_circuit.functional_gates import FunctionalGate
-from quantum_circuit.gates import MatrixGate
-from quantum_circuit.gates import FunctionalGate
-from quantum_circuit.state import State
 import numpy as np
+
+from quantum_circuit.gates import MatrixGate
+from quantum_circuit.state import State
 
 
 def create_rotation_gate(theta):
@@ -16,19 +16,6 @@ def create_rotation_gate(theta):
     """
     return MatrixGate(1, [[1, 0], [0, np.exp(theta * 1j)]])
 
-"""
-Method to merge gates (using tensor product) into a larger one
-"""
-def create_gate(qubit_count, gate_list):
-    """
-    :param qubit_count: number of qubits
-    :param gate_list: list of applied gates
-    :return: joint gate
-    """
-    gate = [[1]]
-    for i in range(qubit_count):
-        gate = np.kron(gate_list[i].matrix, gate)
-    return MatrixGate(qubit_count, gate)
 
 """
 Quantum Fourier Transform
@@ -75,7 +62,7 @@ def phase_flip_gate(qubit_count, key):
         else:
             gate_list.append(identity)
 
-    gate_X = create_gate(qubit_count, gate_list)
+    gate_X = MatrixGate.join_gates(qubit_count, gate_list)
     gate_flip = MatrixGate.controlled_gate(qubit_count, pauli_z, [0],
                                            list(range(1, qubit_count)))
     return gate_X * gate_flip * gate_X
@@ -90,10 +77,10 @@ Inverts around the mean
 def diffusion_gate(qubit_count):
     # create matrix to apply Hadamard to every qubit
     gate_list = [hadamard for i in range(qubit_count)]
-    H_n = create_gate(qubit_count, gate_list)
+    H_n = MatrixGate.join_gates(qubit_count, gate_list)
     # create matrix to apply identity to every qubit
     gate_list = [identity for i in range(qubit_count)]
-    I_n = create_gate(qubit_count, gate_list)
+    I_n = MatrixGate.join_gates(qubit_count, gate_list)
     # create the matrix Z0 = 2|0><0|-I
     zero_state = State.from_basis_state(qubit_count, 0)
     Z0 = MatrixGate(qubit_count,

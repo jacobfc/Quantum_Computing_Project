@@ -242,6 +242,19 @@ class MatrixGate(Gate):
 
         return cls(qubit_count, mat, dtype=dtype)
 
+    @classmethod
+    def join_gates(cls, qubit_count, gate_list):
+        """ Method to merge matrix gates (using tensor product) into a larger one
+
+        :param qubit_count: number of qubits
+        :param gate_list: list of applied gates
+        :return: joint gate
+        """
+        gate = [[1]]
+        for i in range(qubit_count):
+            gate = np.kron(gate_list[i].matrix, gate)
+        return cls(qubit_count, gate)
+
     def __init__(self, qubit_count, matrix, dtype=np.complex128):
         self._dtype = dtype
         self._qubit_count = qubit_count
