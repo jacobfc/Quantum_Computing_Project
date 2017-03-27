@@ -32,13 +32,13 @@ def main():
     H_n = quantum_circuit.MatrixGate.join_gates(qubit_count, gate_list)
 
     # create superposition by applying Hadamard to every qubit
-    state = State(np.dot(state, H_n.matrix))
+    state = H_n(state)
     # perform Grover step required number of times
     full = flip_gate * diff_gate
     for i in range(n - 1):
         full *= flip_gate * diff_gate
     # apply the matrix to get the final state
-    final = State(np.dot(state, full.matrix))
+    final = full(state)
     print(final)
 
 

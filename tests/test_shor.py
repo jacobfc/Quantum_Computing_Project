@@ -20,7 +20,7 @@ def shor_quantum(N, m, n, i):
     # Create input i-qubit register
     input_register = State.from_basis_state(i, 1)
     # Apply qft to put the states into uniform superposition
-    input_register = State(np.dot(input_register, QFT_n.matrix))
+    input_register = QFT_n(input_register)
 
     found = np.full(n, False)
     number = 0

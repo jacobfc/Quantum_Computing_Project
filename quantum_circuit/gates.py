@@ -5,21 +5,34 @@ import abc
 
 
 class Gate(metaclass=abc.ABCMeta):
+    def __init__(self):
+        """ Initialize a gate matrix.
+
+        Extending classes may freely use a different signature for this method.
+
+        self._dtype must be set to a complex number type, that is used in
+        creating and computing output states (for the amplitudes).
+        """
+        self._dtype = None  # must be a complex number type
+        raise NotImplementedError()
+
     @property
     @abc.abstractproperty
     def qubit_count(self):
+        """ Number of qubits (in classical analogy: wires). """
         raise NotImplementedError()
 
     @property
     @abc.abstractproperty
     def basis_size(self):
+        """ Number of basis states, same as 2 ^ qubit_count. """
         raise NotImplementedError()
 
     @property
     def dtype(self):
         """ Specifies the data type used in constructing states and matrices.
 
-        The property *Gate._dtype must be set by child classes.
+        The property (attribute) *Gate._dtype must be set by child classes.
         """
         return self._dtype
 
@@ -27,6 +40,7 @@ class Gate(metaclass=abc.ABCMeta):
     def eval_bs(self, basis_state):
         """ Apply gate to basis state as input.
 
+        :type basis_state: int
         :param basis_state: Integer representing a basis state in computational
             basis.
         :return: State
@@ -35,16 +49,18 @@ class Gate(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def __call__(self, state):
-        """
-        Call a gate to act on a state
-        :param state: The state for the gate to act on
-        :return: The state resulting from the gate acting on the input state
+        """ Call a gate to act on a state.
+
+        :type state: State
+        :param state: The State for the gate to act on.
+        :return: The State obtained by applying the gate's operation
+            on the input state.
         """
         raise NotImplementedError()
 
     @abc.abstractmethod
     def __mul__(self, gate2):
-        """ g1 * g2 is equivalent of saying first apply g2 then g1
+        """ g1 * g2 returns a gate that first applies g2, then g1.
 
         :param gate2: A gate.
         :return: A gate equivalent to the operation g1(g2(state)).
@@ -223,7 +239,6 @@ class FunctionalGate(Gate):
         :param state: State which the gate is acting on
         :return: The result of the Gate acting on the State
         """
-        # simple implementation, may be overridden
         return sum(state[k] * self.eval_bs(k) for k in range(self.basis_size))
 
     def __mul__(self, gate2):
@@ -355,7 +370,7 @@ def _insert_sub_bit_superpos(basis_size, state, insert_state, apply_qubits,
     empty_apply = _clear_bits(state, apply_qubits)
 
     # iterate over all output states
-    for k in range(len(insert_state)):
+    for k in range(insert_state.basis_size):
         # transfer bit occupation of basis state from u's basis
         # back to the full basis
         set_apply = sum(1 << apply_qubits[i]  # value of ith qubit

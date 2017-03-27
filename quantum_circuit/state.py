@@ -128,12 +128,13 @@ class State(object):
         :param normalize: Normalize state before calculating amplitudes.
         :return: The probability of the system being in the state of interest
         """
+        prob = np.square(abs(self * state))
         if normalize:
             # doing the calculation like this makes it more accurate
             norm = (self * self).real * (state * state).real
-            return np.square(abs(self * state)) / norm
+            return prob / norm
         else:
-            return np.square(np.conj(self).dot(state).real)
+            return prob
 
     def random_measure_bs(self):
         """ Select a basis state with probabilities according to amplitudes.
@@ -183,22 +184,45 @@ class State(object):
         return State(state, dtype=dtype)
 
     def __len__(self):
-        return self.basis_size
+        """ Prevent the implementation of len.
+
+        state must not implement len, otherwise multiplying a numpy data type
+        and a state will result in __mul__ being (successfully) called on the
+        numpy data type (which is possible because __getitem__ and __iter__ are
+        implemented by State). This, however returns a new numpy array of the
+        left hand data type, instead of a State (which is what we want).
+        By raising an error here, this case results in __rmul__ being called
+        on state, which is the correct behaviour.
+
+        >>> s = np.complex128(42) * State.from_basis_state(4, 0)
+        >>> type(s) == State # s must be a state, not (!) an ndarray
+        True
+
+        :return: Failure.
+        """
+        raise NotImplementedError()
 
     def __getitem__(self, item):
-        return self.amplitudes.__getitem__(item)
+        return self.amplitudes[item]
 
     def __setitem__(self, key, value):
-        return self.amplitudes.__setitem__(key, value)
+        self.amplitudes[key] = value
 
     def __eq__(self, state):
-        return np.array_equal(self, state)
+        # state can be any list of amplitudes, not necessarily of type State
+        if isinstance(state, State) and self.qubit_count != state.qubit_count:
+            return False
+
+        for i, j in zip(self, state):
+            if i != j:
+                return False
+        return True
 
     def __repr__(self):
         return self.amplitudes.__repr__()
 
     def __add__(self, state):
-        return State(self.amplitudes + state)
+        return State(self.amplitudes + state.amplitudes)
 
     def __radd__(self, other):
         """ Support addition to zero (as neutral element).
@@ -237,11 +261,12 @@ class State(object):
             state -> complex number <self|other>
         """
         if isinstance(other, State):
-            return np.conj(self).dot(other)
-        return State(self.amplitudes.__mul__(other))
+            return np.conj(self.amplitudes).dot(other.amplitudes)
+        else:
+            return State(other * self.amplitudes)
 
     def __rmul__(self, number):
-        return State(self.amplitudes.__rmul__(number))
+        return self * number
 
     def __truediv__(self, number):
         return State(self.amplitudes / number)
