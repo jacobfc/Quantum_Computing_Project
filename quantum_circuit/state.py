@@ -355,7 +355,7 @@ class State(object):
             if imag == 0:
                 rep = [sign(real), '%.3f' % abs(real)]  # [sign, number]
             elif real == 0:
-                rep = [sign(imag), '%.3f' % abs(imag)]
+                rep = [sign(imag), '%.3fj' % abs(imag)]
             elif imag < 0:
                 if real < 0:
                     rep = ['-', '(%.3f + j %.3f)' % (-real, -imag)]
