@@ -104,30 +104,36 @@ class State(object):
         # (self * self).imag == 0, no information lost.
         return np.sqrt((self * self).real)
 
-    def is_normalized(self):
-        """Checks if a State object is (close to being) normalized (sum of squared amplitudes == 1)
-        Uses the numpy function isclose
+    def is_normalized(self, rtol=1e-5, atol=1e-8):
+        """Checks if a State object is (close to being) normalized.
+
+        It is normalized, if sum of squared amplitudes == 1.
+        Uses the numpy function isclose.
+
+
+        :param rtol: Relative tolarence, see np.isclose.
+        :param atol: Absolute tolerance, see np.isclose.
         :return: Returns the Bool:
                     True if the object is close to being normalized
                     False if the object is not close to being normalized
         """
-        return np.isclose(self.norm(), 1)
+        return np.isclose(self.norm(), 1, rtol=rtol, atol=atol)
 
-    def prob_of_bs(self, bs, normalize=True):
+    def prob_of_bs(self, basis_state, normalize=True):
         """
 
-        :param bs: The basis state of interest.
+        :param basis_state: The basis state of interest.
         :param normalize: Normalize state before calculating amplitudes.
         :return: The probability of the system being in the basis state
             of interest.
         """
         if normalize:
-            return np.square(abs(self[bs])) / (self * self).real
+            return np.square(abs(self[basis_state])) / (self * self).real
         else:
-            return np.square(abs(self[bs]))
+            return np.square(abs(self[basis_state]))
 
     def prob_of_state(self, state, normalize=True):
-        """The probability of a State being in particular State object (not necessarily a basis state)
+        """The probability of a State being in particular State object.
 
         :param state: The state of interest (does NOT have to be a basis state,
             can be any State object)
@@ -165,13 +171,13 @@ class State(object):
         :return: The basis state which the state was measured to be in
         """
         sample = np.random.random_sample()  # random number in [0, 1)
-        bs = 0  # start "checking" if it's in the 0th basis state
-        acc = self.prob_of_bs(bs)
+        basis_state = 0  # start "checking" if it's in the 0th basis state
+        acc = self.prob_of_bs(basis_state)
         # if we haven't measured that state, keep checking the next states
         while acc < sample:
-            bs += 1
-            acc += self.prob_of_bs(bs)
-        return bs
+            basis_state += 1
+            acc += self.prob_of_bs(basis_state)
+        return basis_state
 
     def random_measure_qubit(self, qubit):
         """ Randomly get state of one qubit according to state's probabilities.
@@ -290,7 +296,7 @@ class State(object):
         return self + other  # code execution should never come to this point
 
     def __sub__(self, state):
-        """Subtract the amplitudes of one state by the amplitudes of another state
+        """ Subtract amplitudes of one state by the amplitudes of another state
 
         :param state: the State object being subtracted by
         :return: State resulting from the subtraction
@@ -344,6 +350,7 @@ class State(object):
             return "0 |0>"
 
         def sign(num):
+            """ Return sign of number as string. """
             return '+' if num > 0 else '-'
 
         for amp, label in zip(self, range(self.basis_size)):
@@ -352,21 +359,26 @@ class State(object):
 
             imag, real = amp.imag, amp.real
 
+            # separate each amplitude into
+            # rep = [sign, number]
+            # where *number* is a string representing a complex number.
+            # List entries are later concatinated.
+
             if imag == 0:
-                rep = [sign(real), '%.3f' % abs(real)]  # [sign, number]
+                rep = [sign(real), '%.3f' % abs(real)]
+
             elif real == 0:
                 rep = [sign(imag), '%.3fj' % abs(imag)]
-            elif imag < 0:
-                if real < 0:
-                    rep = ['-', '(%.3f + j %.3f)' % (-real, -imag)]
-                else:
-                    rep = ['+', '(%.3f - j %.3f)' % (real, -imag)]
+
+            if imag < 0 and real < 0:
+                rep = ['-', '%.3f %s j %.3f' % (-real, sign(-imag), -imag)]
+
             else:
                 rep = ['+', '(%.3f + j %.3f)' % (real, imag)]
 
-            rep.append('|%d>' % label)
+            rep.append('|' + str(label) + '>')
 
-            if len(parts) == 0:
+            if len(parts) == 0:     # if this is the first entry omit +
                 if rep[0] == '-':
                     parts.append('-' + rep[1])
                     parts.append(rep[2])

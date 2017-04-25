@@ -1,7 +1,7 @@
-from quantum_circuit.state import State
-
-import numpy as np
 import abc
+import numpy as np
+
+from quantum_circuit.state import State
 
 
 class Gate(metaclass=abc.ABCMeta):
@@ -64,7 +64,6 @@ class Gate(metaclass=abc.ABCMeta):
         """
         raise NotImplementedError()
 
-    @abc.abstractmethod
     def __mul__(self, gate2):
         """ g1 * g2 returns a gate that first applies g2, then g1.
 
@@ -74,7 +73,8 @@ class Gate(metaclass=abc.ABCMeta):
             The gate is a matrix gate if gate2 is a matrix gate,
             otherwise a functional gate is returned
         """
-        raise NotImplementedError()
+        return FunctionalGate.from_eval_bs(self.qubit_count,
+                                           lambda bs: self(gate2.eval_bs(bs)))
 
     @classmethod
     def from_eval_bs(cls, qubit_count, _eval_bs, dtype=np.complex128):
@@ -268,8 +268,8 @@ class FunctionalGate(Gate):
         :param dtype: Complex number type used to create States.
         :return: State
         """
-        def _eval_bs(bs):
-            return _eval_state(State.from_basis_state(qubit_count, bs))
+        def _eval_bs(basis_state):
+            return _eval_state(State.from_basis_state(qubit_count, basis_state))
         return cls(qubit_count, _eval_bs, _eval_state, dtype=dtype)
 
     def __init__(self, qubit_count, _eval_bs, _eval_state, dtype=np.complex128):
@@ -284,6 +284,7 @@ class FunctionalGate(Gate):
         :param _eval_state: Function mapping full State to full output State
         :param dtype: Data type for constructing states (amplitudes)
         """
+        # don't call super().__init__(), parent is abstract
         self._dtype = dtype
         self._basis_size = 1 << qubit_count
         self._qubit_count = qubit_count
@@ -303,15 +304,11 @@ class FunctionalGate(Gate):
 
     def __call__(self, state):
         """ Calls a gate on state.
-        
+
         :param state: State which the gate is acting on
         :return: The result of the Gate acting on the State
         """
         return self._eval_state(state)
-
-    def __mul__(self, gate2):
-        return FunctionalGate(self.qubit_count,
-                              lambda bs: self(gate2.eval_bs(bs)))
 
 
 class MatrixGate(Gate):
@@ -320,8 +317,8 @@ class MatrixGate(Gate):
         basis_size = 1 << qubit_count
         # Start with an empty (basis_size x basis_size) matrix
         mat = np.zeros((basis_size, basis_size), dtype)
-        for bs in range(basis_size):
-            mat[:, bs] = _eval_bs(bs).amplitudes
+        for basis_state in range(basis_size):
+            mat[:, basis_state] = _eval_bs(basis_state).amplitudes
 
         return cls(qubit_count, mat, dtype=dtype)
 
@@ -339,6 +336,7 @@ class MatrixGate(Gate):
         return cls(qubit_count, gate)
 
     def __init__(self, qubit_count, matrix, dtype=np.complex128):
+        # don't call super().__init__(), parent is abstract
         self._dtype = dtype
         self._qubit_count = qubit_count
         self._basis_size = 1 << qubit_count
@@ -450,20 +448,20 @@ def _extract_sub_bs(basis_state, qubits):
                if basis_state & (1 << qubits[i]) != 0)
 
 
-def _insert_sub_bit_superpos(basis_size, bs, insert_state, apply_qubits,
-                             dtype=np.complex128):
+def _insert_sub_bit_superpos(basis_size, basis_state, insert_state,
+                             apply_qubits, dtype=np.complex128):
     """ Insert full state of subset of qubits into a full-sized basis_size.
 
-    Sets the bits in bs corresponding to insert_state to all possible
+    Sets the bits in basis_state corresponding to insert_state to all possible
     assignments and weight them in a sum given the amplitudes of insert_state.
 
     :type basis_size: int
-    :type bs: int
+    :type basis_state: int
     :type insert_state: State
     :type apply_qubits: [int]
     :type dtype: type
     :param basis_size: Size of the basis bs.
-    :param bs: basis state.
+    :param basis_state: basis state.
     :param insert_state: int, in basis of size 2 ** len(apply_qubits)
     :param apply_qubits: Indices of qubits, insert_state corresponds to.
         Listed in order of ascending significance.
@@ -473,11 +471,11 @@ def _insert_sub_bit_superpos(basis_size, bs, insert_state, apply_qubits,
     out_state_raw = np.zeros(basis_size, dtype)
 
     # set apply qubits to zero
-    empty_apply = _clear_bits(bs, apply_qubits)
+    empty_apply = _clear_bits(basis_state, apply_qubits)
 
     # iterate over all output states
     for k in range(insert_state.basis_size):
-        # transfer bit occupation of basis bs from u's basis
+        # transfer bit occupation of basis basis_state from u's basis
         # back to the full basis
         set_apply = sum(1 << apply_qubits[i]  # value of ith qubit
                         # iterate over apply qubits
