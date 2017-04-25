@@ -1,5 +1,25 @@
 import numpy as np
 
+""" This module provides the State data structure. 
+
+A State represents the full quantum mechanical state of a arbitrary but fix
+number of qubits.
+
+In analogy to a classical gate, this specifies the 'values' (0 or 1) of all
+wires at a specific cross-section of a circuit. (Note here that quantum curcuits
+are, as opposed to classical ones, linear. That means that along the circuit
+the number of qubits doesn't change. This is equivalent to saying that along the
+circuit no information is lost.) However, for a given number of (qu-)bits, the
+quantum circuit can be in exponentially more states than a classical one.
+This is because a state is generally a superposition of multiple 'classical',
+un-entangled states. (A state can always be represented via a superposition of
+basis states. The choice of basis states is arbitrary. In this implementation, 
+we choose the 'intuitive' classical states as basis states. This choice of
+basis is called 'computational basis'.) Therefore, a State object stores the
+amplitudes of each basis state and provides methods to manipulate these.
+
+A more technical and detailed explanation is provided in the State class.
+"""
 
 class State(object):
     """ Data structure representing the general state of a set of qubits.
